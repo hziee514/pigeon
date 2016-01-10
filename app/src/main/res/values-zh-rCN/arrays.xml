@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="cage_filters">
+        <item>闲置</item>
+        <item>健康</item>
+        <item>生病</item>
+        <item>全部</item>
+    </string-array>
+</resources>
