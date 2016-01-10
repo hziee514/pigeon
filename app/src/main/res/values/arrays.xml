@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="cage_filters">
-        <item>Idle</item>
-        <item>Healthly</item>
-        <item>Sick</item>
-        <item>All</item>
-    </string-array>
-</resources>
