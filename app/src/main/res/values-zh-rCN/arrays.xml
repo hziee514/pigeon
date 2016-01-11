@@ -6,4 +6,10 @@
         <item>生病</item>
         <item>全部</item>
     </string-array>
+
+    <string-array name="cage_status">
+        <item>闲置</item>
+        <item>健康</item>
+        <item>生病</item>
+    </string-array>
 </resources>

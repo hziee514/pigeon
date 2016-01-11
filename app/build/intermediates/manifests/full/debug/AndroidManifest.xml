@@ -8,8 +8,14 @@
         android:minSdkVersion="19"
         android:targetSdkVersion="23" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
 
     <application
         android:name="wrh.pigeon.MyApplication"
@@ -26,6 +32,13 @@
             </intent-filter>
         </activity>
         <activity android:name="wrh.pigeon.CageExpandableListActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.PIGEON" />
+            </intent-filter>
+        </activity>
+        <activity android:name="wrh.pigeon.TodayWorkListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

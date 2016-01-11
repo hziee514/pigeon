@@ -6,6 +6,11 @@
         <item>生病</item>
         <item>全部</item>
     </string-array>
+    <string-array name="cage_status">
+        <item>闲置</item>
+        <item>健康</item>
+        <item>生病</item>
+    </string-array>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"转到主屏幕"</string>
     <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s：%2$s"</string>
     <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s - %2$s：%3$s"</string>
@@ -28,12 +33,24 @@
     <string name="add_cage">添加笼位</string>
     <string name="add_egg">添加鸽蛋</string>
     <string name="app_name">鸽子</string>
+    <string name="backup">备份</string>
     <string name="cage_healthly">健康</string>
     <string name="cage_idle">闲置</string>
     <string name="cage_sick">生病</string>
     <string name="filter">过滤</string>
+    <string name="firstsn_cant_gt_lastsn">起始编号不能大于结束编号</string>
+    <string name="lbl_first">起始*</string>
+    <string name="lbl_group">分组*</string>
+    <string name="lbl_last">结束*</string>
+    <string name="lbl_layer">层号*</string>
     <string name="lbl_room">房间*</string>
+    <string name="lbl_status">状态*</string>
     <string name="loading">正在加载...</string>
+    <string name="msg_backup_fail">数据库备份失败</string>
+    <string name="msg_backup_succ">数据库备份成功</string>
+    <string name="msg_exit">您确定要关闭并退出吗？</string>
+    <string name="msg_rebuild_works">是否放弃今日工作进度并重新计算今日工作内容？</string>
+    <string name="rebuild_today_works">计算工作</string>
     <string name="refresh">刷新</string>
     <string name="save">保存</string>
     <string name="scan">扫二维码</string>

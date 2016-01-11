@@ -106,6 +106,8 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
         setListAdapter(adapter_);
 
         dlg_loading_.hide();
+
+        Log.d(LOG_NAME, "refreshed");
     }
 
     @Override
@@ -132,7 +134,6 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
 
     @Override
     public void onMyItemDisclosure(int groupPosition, int childPosition) {
-        //Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
     }
 
 }

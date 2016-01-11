@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SimpleExpandableListAdapter;
 
 import java.util.List;
@@ -50,6 +51,8 @@ public class MySimpleExpandableListAdapter extends SimpleExpandableListAdapter {
                 return false;
             }
         });
+        ImageButton button = (ImageButton)view.findViewById(R.id.btn_disclosure);
+        button.setOnClickListener(new MyItemDisclosureListener(groupPosition, childPosition));
         return view;
     }
 
@@ -83,6 +86,22 @@ public class MySimpleExpandableListAdapter extends SimpleExpandableListAdapter {
         public boolean onLongClick(View v) {
             listener_.onMyItemLongClick(groupPosition_, childPosition_);
             return true;
+        }
+    }
+
+    public class MyItemDisclosureListener implements View.OnClickListener{
+
+        private int groupPosition_;
+        private int childPosition_;
+
+        public MyItemDisclosureListener(int groupPosition, int childPosition) {
+            groupPosition_ = groupPosition;
+            childPosition_ = childPosition;
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener_.onMyItemDisclosure(groupPosition_, childPosition_);
         }
     }
 

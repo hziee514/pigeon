@@ -22,6 +22,7 @@ public final class R {
     }
     public static final class array {
         public static final int cage_filters=0x7f0b0000;
+        public static final int cage_status=0x7f0b0001;
     }
     public static final class attr {
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
@@ -1600,7 +1601,7 @@ containing a value of this type.
         public static final int notification_template_icon_bg=0x7f020046;
     }
     public static final class id {
-        public static final int action0=0x7f0d0054;
+        public static final int action0=0x7f0d005b;
         public static final int action_bar=0x7f0d0041;
         public static final int action_bar_activity_content=0x7f0d0000;
         public static final int action_bar_container=0x7f0d0040;
@@ -1609,7 +1610,7 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f0d0022;
         public static final int action_bar_title=0x7f0d0021;
         public static final int action_context_bar=0x7f0d0042;
-        public static final int action_divider=0x7f0d0058;
+        public static final int action_divider=0x7f0d005f;
         public static final int action_menu_divider=0x7f0d0002;
         public static final int action_menu_presenter=0x7f0d0003;
         public static final int action_mode_bar=0x7f0d003e;
@@ -1619,12 +1620,13 @@ containing a value of this type.
         public static final int alertTitle=0x7f0d0030;
         public static final int always=0x7f0d001b;
         public static final int beginning=0x7f0d0018;
+        public static final int btn_disclosure=0x7f0d005a;
         public static final int buttonPanel=0x7f0d002b;
-        public static final int cage_sn=0x7f0d0052;
-        public static final int cage_status=0x7f0d0053;
-        public static final int cancel_action=0x7f0d0055;
+        public static final int cage_sn=0x7f0d0058;
+        public static final int cage_status=0x7f0d0059;
+        public static final int cancel_action=0x7f0d005c;
         public static final int checkbox=0x7f0d0039;
-        public static final int chronometer=0x7f0d005b;
+        public static final int chronometer=0x7f0d0062;
         public static final int collapseActionView=0x7f0d001c;
         public static final int contentPanel=0x7f0d0031;
         public static final int custom=0x7f0d0037;
@@ -1634,21 +1636,26 @@ containing a value of this type.
         public static final int disableHome=0x7f0d000c;
         public static final int edit_query=0x7f0d0043;
         public static final int end=0x7f0d0019;
-        public static final int end_padder=0x7f0d0060;
+        public static final int end_padder=0x7f0d0067;
         public static final int expand_activities_button=0x7f0d0025;
         public static final int expanded_menu=0x7f0d0038;
-        public static final int group_name=0x7f0d0051;
+        public static final int firstsn=0x7f0d0053;
+        public static final int group_name=0x7f0d0056;
+        public static final int groupid=0x7f0d0051;
         public static final int home=0x7f0d0004;
         public static final int homeAsUp=0x7f0d000d;
         public static final int icon=0x7f0d0029;
         public static final int ifRoom=0x7f0d001d;
         public static final int image=0x7f0d0026;
-        public static final int info=0x7f0d005f;
-        public static final int line1=0x7f0d0059;
-        public static final int line3=0x7f0d005d;
+        public static final int img_status=0x7f0d0057;
+        public static final int info=0x7f0d0066;
+        public static final int lastsn=0x7f0d0054;
+        public static final int layerid=0x7f0d0052;
+        public static final int line1=0x7f0d0060;
+        public static final int line3=0x7f0d0064;
         public static final int listMode=0x7f0d0009;
         public static final int list_item=0x7f0d0028;
-        public static final int media_actions=0x7f0d0057;
+        public static final int media_actions=0x7f0d005e;
         public static final int middle=0x7f0d001a;
         public static final int multiply=0x7f0d0013;
         public static final int never=0x7f0d001e;
@@ -1683,13 +1690,14 @@ containing a value of this type.
         public static final int src_atop=0x7f0d0015;
         public static final int src_in=0x7f0d0016;
         public static final int src_over=0x7f0d0017;
-        public static final int status_bar_latest_event_content=0x7f0d0056;
+        public static final int status=0x7f0d0055;
+        public static final int status_bar_latest_event_content=0x7f0d005d;
         public static final int submit_area=0x7f0d004c;
         public static final int tabMode=0x7f0d000b;
-        public static final int text=0x7f0d005e;
-        public static final int text2=0x7f0d005c;
+        public static final int text=0x7f0d0065;
+        public static final int text2=0x7f0d0063;
         public static final int textSpacerNoButtons=0x7f0d0034;
-        public static final int time=0x7f0d005a;
+        public static final int time=0x7f0d0061;
         public static final int title=0x7f0d002a;
         public static final int title_template=0x7f0d002f;
         public static final int topPanel=0x7f0d002e;
@@ -1774,15 +1782,27 @@ containing a value of this type.
         public static final int add_cage=0x7f060014;
         public static final int add_egg=0x7f060015;
         public static final int app_name=0x7f060016;
-        public static final int cage_healthly=0x7f060017;
-        public static final int cage_idle=0x7f060018;
-        public static final int cage_sick=0x7f060019;
-        public static final int filter=0x7f06001a;
-        public static final int lbl_room=0x7f06001b;
-        public static final int loading=0x7f06001c;
-        public static final int refresh=0x7f06001d;
-        public static final int save=0x7f06001e;
-        public static final int scan=0x7f06001f;
+        public static final int backup=0x7f060017;
+        public static final int cage_healthly=0x7f060018;
+        public static final int cage_idle=0x7f060019;
+        public static final int cage_sick=0x7f06001a;
+        public static final int filter=0x7f06001b;
+        public static final int firstsn_cant_gt_lastsn=0x7f06001c;
+        public static final int lbl_first=0x7f06001d;
+        public static final int lbl_group=0x7f06001e;
+        public static final int lbl_last=0x7f06001f;
+        public static final int lbl_layer=0x7f060020;
+        public static final int lbl_room=0x7f060021;
+        public static final int lbl_status=0x7f060022;
+        public static final int loading=0x7f060023;
+        public static final int msg_backup_fail=0x7f060024;
+        public static final int msg_backup_succ=0x7f060025;
+        public static final int msg_exit=0x7f060026;
+        public static final int msg_rebuild_works=0x7f060027;
+        public static final int rebuild_today_works=0x7f060028;
+        public static final int refresh=0x7f060029;
+        public static final int save=0x7f06002a;
+        public static final int scan=0x7f06002b;
         public static final int status_bar_notification_info_overflow=0x7f060013;
     }
     public static final class style {

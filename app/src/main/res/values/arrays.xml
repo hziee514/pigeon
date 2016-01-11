@@ -6,4 +6,10 @@
         <item>Sick</item>
         <item>All</item>
     </string-array>
+
+    <string-array name="cage_status">
+        <item>Idle</item>
+        <item>Healthly</item>
+        <item>Sick</item>
+    </string-array>
 </resources>

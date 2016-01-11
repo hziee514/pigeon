@@ -10,5 +10,17 @@
     <string name="scan">Scan BarCode</string>
     <string name="add_cage">Add Cage</string>
     <string name="add_egg">Add Egg</string>
+    <string name="backup">Backup</string>
+    <string name="rebuild_today_works">Rebuild Today Works</string>
     <string name="lbl_room">Room*</string>
+    <string name="lbl_group">Group*</string>
+    <string name="lbl_layer">Layer*</string>
+    <string name="lbl_first">First*</string>
+    <string name="lbl_last">Last*</string>
+    <string name="lbl_status">Status*</string>
+    <string name="firstsn_cant_gt_lastsn">First SN Can not be great than Last SN</string>
+    <string name="msg_exit">Do you want to exit anyway?</string>
+    <string name="msg_rebuild_works">Do you want to clear today work process and rebuild?</string>
+    <string name="msg_backup_succ">Backup database success</string>
+    <string name="msg_backup_fail">Backup database failed</string>
 </resources>

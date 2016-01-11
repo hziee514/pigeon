@@ -3,11 +3,13 @@ package wrh.pigeon;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,8 +51,7 @@ public class DbManager {
     public DbManager(Context ctx){
         ctx_ = ctx;
         open();
-
-        backup();
+        //backup();
     }
 
     public void open(){
@@ -58,13 +60,13 @@ public class DbManager {
         }
         db_ = SQLiteDatabase.openDatabase(getSdcardPath(db_name_), null, SQLiteDatabase.CREATE_IF_NECESSARY);
         db_.execSQL("create table if not exists cage_info(id INTEGER PRIMARY KEY,sn TEXT UNIQUE,status INTEGER,create_dt DATETIME)");
-        db_.execSQL("create table if not exists egg_info(id INTEGER PRIMARY KEY,cage_id INTEGER,lay_dt DATETIME,review_dt DATETIME,hatch_dt DATETIME,off_dt DATETIME,status INTEGER,fin_dt DATETIME)");
+        db_.execSQL("create table if not exists egg_info(id INTEGER PRIMARY KEY,cage_id INTEGER, num INTEGER,lay_dt DATETIME,review_dt DATETIME,hatch_dt DATETIME,off_dt DATETIME,status INTEGER,fin_dt DATETIME)");
         db_.execSQL("create table if not exists today_works(id INTEGER PRIMARY KEY,cage_id INTEGER,egg_id INTEGER,work_type INTEGER,create_dt DATETIME,fin_dt DATETIME)");
         db_.execSQL("delete from today_works where date(create_dt) < date('now')");
         Log.d(LOG_NAME, "onCreate: db created");
     }
 
-    public void copyFile(File s, File t){
+    public Boolean copyFile(File s, File t){
         FileInputStream fis = null;
         FileOutputStream fos = null;
         FileChannel in = null;
@@ -83,8 +85,11 @@ public class DbManager {
             in.transferTo(0, in.size(), out);
 
             Log.i(LOG_NAME, "copyFile from " + s.getAbsolutePath() + " to " + t.getAbsolutePath() + " success");
+
+            return true;
         }catch (IOException e){
             Log.e(LOG_NAME, "copyFile from " + s.getAbsolutePath() + " to " + t.getAbsolutePath() + " failed: " + e.getMessage());
+            return false;
         } finally {
             try {
                 if (fis != null)
@@ -113,7 +118,12 @@ public class DbManager {
         if (bdbfile.exists()){
             bdbfile.delete();
         }
-        copyFile(dbfile, bdbfile);
+
+        if (copyFile(dbfile, bdbfile)){
+            Toast.makeText(ctx_, R.string.msg_backup_succ, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(ctx_, R.string.msg_backup_fail, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void add(List<CageInfo> cages){
@@ -123,6 +133,28 @@ public class DbManager {
                 db_.execSQL("insert into cage_info(sn,status,create_dt) values(?,?,datetime('now'))", new Object[]{cage.sn,cage.status});
             }
             db_.setTransactionSuccessful();
+        } finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean batchAddCages(String roomId, String groupId, String layerId, int firstSn, int lastSn, int status){
+        String sql = "insert into cage_info(sn,status,create_dt) values(?,?,datetime('now'))";
+        String sn = "";
+        db_.beginTransaction();
+        try {
+            DecimalFormat df = new DecimalFormat("00");
+            for (int i = firstSn; i <= lastSn; i++) {
+                sn = roomId + "-" + groupId + "-" + layerId + df.format(i);
+                db_.execSQL(sql, new Object[]{sn, status});
+            }
+            db_.setTransactionSuccessful();
+
+            return true;
+        } catch (SQLException e) {
+            Toast.makeText(ctx_, sn + ":" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
         } finally {
             db_.endTransaction();
         }
