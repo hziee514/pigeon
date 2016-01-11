@@ -4,6 +4,11 @@
     <string name="cage_idle">闲置</string>
     <string name="cage_healthly">健康</string>
     <string name="cage_sick">生病</string>
+    <string name="work_lay1">第一个蛋</string>
+    <string name="work_lay2">第二个蛋</string>
+    <string name="work_review">检查坏蛋</string>
+    <string name="work_hatch">检查孵化</string>
+    <string name="work_sell">检查出栏</string>
     <string name="loading">正在加载...</string>
     <string name="save">保存</string>
     <string name="filter">过滤</string>

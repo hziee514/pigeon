@@ -3,6 +3,11 @@
     <string name="cage_idle">Idle</string>
     <string name="cage_healthly">Healthly</string>
     <string name="cage_sick">Sick</string>
+    <string name="work_lay1">Lay first</string>
+    <string name="work_lay2">Lay second</string>
+    <string name="work_review">Review</string>
+    <string name="work_hatch">Hatch</string>
+    <string name="work_sell">Sell</string>
     <string name="loading">Loading...</string>
     <string name="save">Save</string>
     <string name="filter">Filter</string>

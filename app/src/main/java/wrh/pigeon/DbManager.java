@@ -66,6 +66,12 @@ public class DbManager {
         Log.d(LOG_NAME, "onCreate: db created");
     }
 
+    public void close(){
+        if (db_ != null) {
+            db_.close();
+        }
+    }
+
     public Boolean copyFile(File s, File t){
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -126,18 +132,6 @@ public class DbManager {
         }
     }
 
-    public void add(List<CageInfo> cages){
-        db_.beginTransaction();
-        try {
-            for(CageInfo cage : cages){
-                db_.execSQL("insert into cage_info(sn,status,create_dt) values(?,?,datetime('now'))", new Object[]{cage.sn,cage.status});
-            }
-            db_.setTransactionSuccessful();
-        } finally {
-            db_.endTransaction();
-        }
-    }
-
     public Boolean batchAddCages(String roomId, String groupId, String layerId, int firstSn, int lastSn, int status){
         String sql = "insert into cage_info(sn,status,create_dt) values(?,?,datetime('now'))";
         String sn = "";
@@ -160,19 +154,6 @@ public class DbManager {
         }
     }
 
-    public String getCageStatus(int status){
-        switch (status){
-            case 0:
-                return ctx_.getResources().getString(R.string.cage_idle);
-            case 1:
-                return ctx_.getResources().getString(R.string.cage_healthly);
-            case 2:
-                return ctx_.getResources().getString(R.string.cage_sick);
-            default:
-                return "";
-        }
-    }
-
     public Map<String, List<Map<String, String>>> getGroupedCages(int which){
         String sql = "";
         switch (which){
@@ -191,7 +172,7 @@ public class DbManager {
                 break;
         }
         Map<String, List<Map<String, String>>> grouped = new LinkedHashMap<String, List<Map<String, String>>>();
-        Cursor c = db_.rawQuery(sql, new String[]{});
+        Cursor c = db_.rawQuery(sql, null);
         if (c != null){
             if (c.moveToFirst()){
                 do {
@@ -203,7 +184,6 @@ public class DbManager {
                     record.put("id", c.getString(0));
                     record.put("sn", c.getString(1));
                     record.put("status", c.getString(2));
-                    record.put("str_status", getCageStatus(c.getInt(2)));
                     grouped.get(group_name).add(record);
                 }while(c.moveToNext());
             }
@@ -212,9 +192,108 @@ public class DbManager {
         return grouped;
     }
 
-    public void close(){
-        if (db_ != null) {
-            db_.close();
+    public Boolean rebuildTodayWorks(){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("delete from today_works");
+
+            //没下蛋的要检查下蛋
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a " +
+                    "where a.status != 0 and a.id not in(select distinct cage_id from egg_info x where x.status = 0) ");
+
+            //孵化后第14天后要检查下蛋
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a , egg_info b " +
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now') ");
+
+            //下第一个蛋后2天内（明天，后天）检查下蛋
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 1 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a , egg_info b " +
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 1 and b.lay_dt is not null and date(b.lay_dt) < date('now') and date(b.lay_dt, '2 day') >= date('now') ");
+
+            //下第二个蛋后第4天检查蛋的好坏
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 2 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a , egg_info b " +
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '3 day') < date('now') ");
+
+            //下第二个蛋后第17天检查孵化了没有
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 3 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a , egg_info b " +
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '17 day') <= date('now') ");
+
+            //孵化后第28天出栏
+            db_.execSQL(
+                    "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 4 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "from cage_info a , egg_info b " +
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.hatch_dt is not null and date(b.hatch_dt, '27 day') <= date('now') ");
+
+            db_.setTransactionSuccessful();
+            return true;
+        } catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
         }
+    }
+
+    public Map<String, List<Map<String, String>>> getGroupedWorks(int which){
+        String sql = "";
+        switch (which) {
+            case TodayWorkListActivity.FILTER_WAIT:
+                sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
+                        "from today_works a, cage_info b " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now') and a.fin_dt is null " +
+                        "order by catelog, cage_sn, work_type, fin_dt ";
+                break;
+            case TodayWorkListActivity.FILTER_FIN:
+                sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
+                        "from today_works a, cage_info b " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now') and a.fin_dt is not null " +
+                        "order by catelog, cage_sn, work_type, fin_dt ";
+                break;
+            case TodayWorkListActivity.FILTER_ALL:
+            default:
+                sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
+                        "from today_works a, cage_info b " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now') " +
+                        "order by catelog, cage_sn, work_type, fin_dt ";
+                break;
+        }
+        Map<String, List<Map<String, String>>> grouped = new LinkedHashMap<String, List<Map<String, String>>>();
+        Cursor c = db_.rawQuery(sql, null);
+        if (c != null){
+            if (c.moveToFirst()){
+                do {
+                    String group_name = c.getString(6);
+                    if (!grouped.containsKey(group_name)){
+                        grouped.put(group_name, new ArrayList<Map<String, String>>());
+                    }
+                    Map<String, String> record = new LinkedHashMap<String, String>();
+                    record.put("id", c.getString(0));
+                    record.put("cage_id", c.getString(1));
+                    record.put("cage_sn", c.getString(2));
+                    record.put("egg_id", c.getString(3));
+                    record.put("work_type", c.getString(4));
+                    record.put("fin_dt", c.getString(5));
+                    grouped.get(group_name).add(record);
+                }while(c.moveToNext());
+            }
+            c.close();
+        }
+        return grouped;
     }
 }

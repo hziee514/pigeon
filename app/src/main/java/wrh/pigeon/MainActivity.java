@@ -82,6 +82,9 @@ public class MainActivity extends TabActivity {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ((MyApplication)getApplication()).getDbManager().rebuildTodayWorks();
+                        getTabHost().setCurrentTab(2);
+                        ((TodayWorkListActivity)getTabHost().getCurrentView().getContext()).refresh();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

@@ -1,6 +1,5 @@
 package wrh.pigeon;
 
-import android.app.Dialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,8 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,13 +40,13 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             View  view = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
             Map<String, String> record = cages_.get(groupPosition).get(childPosition);
+            TextView textView = (TextView)view.findViewById(R.id.text2);
             if (record.get("status").equals("1")){
-                TextView textView = (TextView)view.findViewById(R.id.cage_status);
                 textView.setTextColor(Color.GREEN);
             } else if (record.get("status").equals("2")) {
-                TextView textView = (TextView)view.findViewById(R.id.cage_status);
                 textView.setTextColor(Color.RED);
             }
+            textView.setText(getCageStatusRes(record.get("status")));
             return view;
         }
     }
@@ -68,6 +65,18 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
     public static final int FILTER_ALL = 3;
 
     private int filter_status = FILTER_ALL;
+
+    public static int getCageStatusRes(String status){
+        if ("0".equals(status)) {
+            return R.string.cage_idle;
+        } else if ("1".equals(status)) {
+            return R.string.cage_healthly;
+        } else if ("2".equals(status)) {
+            return R.string.cage_sick;
+        } else {
+            return R.string.cage_idle;
+        }
+    }
 
     public void filter(int which){
         filter_status = which;
@@ -94,13 +103,13 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
         adapter_ = new CageExpandableListAdapter(
                 this,
                 group_data,
-                R.layout.cagelist_group,
+                R.layout.expandablelist_group,
                 new String[] { "name" },
                 new int[] { R.id.group_name },
                 cages_,
-                R.layout.cagelist_item,
-                new String[] { "sn", "str_status" },
-                new int[] { R.id.cage_sn, R.id.cage_status },
+                R.layout.expandablelist_item,
+                new String[] { "sn", "status" },
+                new int[] { R.id.text1, R.id.text2 },
                 this
         );
         setListAdapter(adapter_);
