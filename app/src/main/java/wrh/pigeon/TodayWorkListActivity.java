@@ -1,9 +1,10 @@
 package wrh.pigeon;
 
+import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,14 +25,16 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         dlg_loading_ = new ProgressDialog(this);
         dlg_loading_.setMessage(getResources().getString(R.string.loading));
         dlg_loading_.setIndeterminate(true);
         dlg_loading_.setCancelable(false);
+
         refresh();
     }
 
-    public class TodayWorkListAdapter extends MySimpleExpandableListAdapter{
+    public class TodayWorkListAdapter extends MyExpandableListAdapter {
 
         public TodayWorkListAdapter(Context context,
                                     List<? extends Map<String, ?>> groupData,
@@ -82,6 +85,7 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
     private static final String LOG_NAME = "TodayWorkList";
     private TodayWorkListAdapter adapter_;
     private List<List<Map<String, String>>> works_ = null;
+
     private ProgressDialog dlg_loading_;
 
     public static final int FILTER_WAIT = 0;
@@ -132,17 +136,55 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
     }
 
     @Override
-    public void onMyItemClick(int groupPosition, int childPosition) {
+    public void onMyItemClick(View view, int groupPosition, int childPosition) {
 
     }
 
     @Override
-    public void onMyItemLongClick(int groupPosition, int childPosition) {
+    public void onMyItemLongClick(View view, int groupPosition, int childPosition) {
+        final Map<String, String> work = works_.get(groupPosition).get(childPosition);
+        final String work_type = work.get("work_type");
+        final DbManager dbm = ((MyApplication)getApplication()).getDbManager();
+        final ImageView imageView = (ImageView)view.findViewById(R.id.img_status);
 
+        new AlertDialog.Builder(TodayWorkListActivity.this)
+                .setItems(R.array.work_action, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: //已经确检
+                                if ("0".equals(work_type)) {
+                                    if (dbm.addFirstEgg(work.get("id"), work.get("cage_id"))) {
+                                        imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                    }
+                                } else if ("1".equals(work_type)) {
+                                    if (dbm.addEgg(work.get("id"), work.get("egg_id"))) {
+                                        imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                    }
+                                } else if ("2".equals(work_type)) {
+                                    if (dbm.reviewEgg(work.get("id"), work.get("egg_id"))) {
+                                        imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                    }
+                                } else if ("3".equals(work_type)) {
+                                    if (dbm.hatchEgg(work.get("id"), work.get("egg_id"))) {
+                                        imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                    }
+                                } else if ("4".equals(work_type)) {
+                                    if (dbm.offEgg(work.get("id"), work.get("egg_id"))) {
+                                        imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                    }
+                                }
+                                break;
+                            case 1: //明天在看
+                                dbm.finWork(work.get("id"));
+                                imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                break;
+                        }
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override
-    public void onMyItemDisclosure(int groupPosition, int childPosition) {
-
-    }
+    public void onMyItemDisclosure(View view, int groupPosition, int childPosition) {}
 }

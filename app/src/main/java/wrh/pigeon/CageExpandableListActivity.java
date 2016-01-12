@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class CageExpandableListActivity extends ExpandableListActivity implements OnMyItemClickLisener {
 
-    public class CageExpandableListAdapter extends MySimpleExpandableListAdapter{
+    public class CageExpandableListAdapter extends MyExpandableListAdapter {
 
         public CageExpandableListAdapter(Context context,
                                          List<? extends Map<String, ?>> groupData,
@@ -130,19 +130,19 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
     }
 
     @Override
-    public void onMyItemClick(int groupPosition, int childPosition) {
+    public void onMyItemClick(View view, int groupPosition, int childPosition) {
         Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
         Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onMyItemLongClick(int groupPosition, int childPosition) {
+    public void onMyItemLongClick(View view, int groupPosition, int childPosition) {
         Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
         Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onMyItemDisclosure(int groupPosition, int childPosition) {
+    public void onMyItemDisclosure(View view, int groupPosition, int childPosition) {
     }
 
 }

@@ -112,7 +112,7 @@ public class DbManager {
         }
     }
 
-    private String getTimeStamp(){
+    public static String getTimeStamp(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         return sdf.format(new Date());
     }
@@ -180,7 +180,7 @@ public class DbManager {
                     if (!grouped.containsKey(group_name)){
                         grouped.put(group_name, new ArrayList<Map<String, String>>());
                     }
-                    Map<String, String> record = new LinkedHashMap<String, String>();
+                    Map<String, String> record = new HashMap<String, String>();
                     record.put("id", c.getString(0));
                     record.put("sn", c.getString(1));
                     record.put("status", c.getString(2));
@@ -189,6 +189,11 @@ public class DbManager {
             }
             c.close();
         }
+        return grouped;
+    }
+
+    public Map<String, List<Map<String, String>>> getGroupedFeedsByStage(){
+        Map<String, List<Map<String, String>>> grouped = new LinkedHashMap<String, List<Map<String, String>>>();
         return grouped;
     }
 
@@ -282,7 +287,7 @@ public class DbManager {
                     if (!grouped.containsKey(group_name)){
                         grouped.put(group_name, new ArrayList<Map<String, String>>());
                     }
-                    Map<String, String> record = new LinkedHashMap<String, String>();
+                    Map<String, String> record = new HashMap<String, String>();
                     record.put("id", c.getString(0));
                     record.put("cage_id", c.getString(1));
                     record.put("cage_sn", c.getString(2));
@@ -295,5 +300,89 @@ public class DbManager {
             c.close();
         }
         return grouped;
+    }
+
+    public Boolean addFirstEgg(String work_id, String cage_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("insert into egg_info(cage_id,num,lay_dt,status) values(?,1,datetime('now'),0)", new String[]{cage_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[]{work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean addEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean reviewEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set review_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean hatchEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set hatch_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean offEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set status=1,off_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public void finWork(String work_id){
+        db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
     }
 }

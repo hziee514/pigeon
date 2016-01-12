@@ -7,9 +7,20 @@
         <item>All</item>
     </string-array>
 
+    <string-array name="work_filters">
+        <item>Waiting</item>
+        <item>Finish</item>
+        <item>All</item>
+    </string-array>
+
     <string-array name="cage_status">
         <item>Idle</item>
         <item>Healthly</item>
         <item>Sick</item>
+    </string-array>
+
+    <string-array name="work_action">
+        <item>Already lay an egg</item>
+        <item>Review tomorrow</item>
     </string-array>
 </resources>

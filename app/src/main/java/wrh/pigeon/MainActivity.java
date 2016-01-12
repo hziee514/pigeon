@@ -33,6 +33,7 @@ import java.util.Map;
 public class MainActivity extends TabActivity {
 
     private AlertDialog dlg_filter_cage_;
+    private AlertDialog dlg_filter_work_;
     private AlertDialog dlg_exit_prompt_;
     private AlertDialog dlg_rebuild_works_;
 
@@ -55,6 +56,15 @@ public class MainActivity extends TabActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         that.filterCages(which);
                         dlg_filter_cage_.hide();
+                    }
+                })
+                .create();
+
+        dlg_filter_work_ = new AlertDialog.Builder(MainActivity.this)
+                .setSingleChoiceItems(R.array.work_filters, TodayWorkListActivity.FILTER_ALL, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        that.filterWorks(which);
+                        dlg_filter_work_.hide();
                     }
                 })
                 .create();
@@ -174,14 +184,17 @@ public class MainActivity extends TabActivity {
             case 1:
                 break;
             case 2:
+                dlg_filter_work_.show();
                 break;
         }
     }
 
     protected void filterCages(int which){
-        final TabHost tabHost = getTabHost();
-        CageExpandableListActivity activity = (CageExpandableListActivity)tabHost.getCurrentView().getContext();
-        activity.filter(which);
+        ((CageExpandableListActivity)getTabHost().getCurrentView().getContext()).filter(which);
+    }
+
+    protected void filterWorks(int which){
+        ((TodayWorkListActivity)getTabHost().getCurrentView().getContext()).filter(which);
     }
 
     protected void onRefresh(){
