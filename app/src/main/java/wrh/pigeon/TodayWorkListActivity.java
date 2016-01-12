@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,6 +149,13 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
         final DbManager dbm = ((MyApplication)getApplication()).getDbManager();
         final ImageView imageView = (ImageView)view.findViewById(R.id.img_status);
 
+        if (work.get("fin_dt") != null && !"".equals(work.get("fin_dt"))){
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final String fin_dt = sdf.format(new Date());
+
         new AlertDialog.Builder(TodayWorkListActivity.this)
                 .setItems(R.array.work_action, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -155,28 +164,34 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
                                 if ("0".equals(work_type)) {
                                     if (dbm.addFirstEgg(work.get("id"), work.get("cage_id"))) {
                                         imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                        work.put("fin_dt", fin_dt);
                                     }
                                 } else if ("1".equals(work_type)) {
                                     if (dbm.addEgg(work.get("id"), work.get("egg_id"))) {
                                         imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                        work.put("fin_dt", fin_dt);
                                     }
                                 } else if ("2".equals(work_type)) {
                                     if (dbm.reviewEgg(work.get("id"), work.get("egg_id"))) {
                                         imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                        work.put("fin_dt", fin_dt);
                                     }
                                 } else if ("3".equals(work_type)) {
                                     if (dbm.hatchEgg(work.get("id"), work.get("egg_id"))) {
                                         imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                        work.put("fin_dt", fin_dt);
                                     }
                                 } else if ("4".equals(work_type)) {
                                     if (dbm.offEgg(work.get("id"), work.get("egg_id"))) {
                                         imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                        work.put("fin_dt", fin_dt);
                                     }
                                 }
                                 break;
                             case 1: //明天在看
                                 dbm.finWork(work.get("id"));
                                 imageView.setImageResource(android.R.drawable.checkbox_on_background);
+                                work.put("fin_dt", fin_dt);
                                 break;
                         }
                     }

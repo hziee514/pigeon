@@ -192,8 +192,105 @@ public class DbManager {
         return grouped;
     }
 
-    public Map<String, List<Map<String, String>>> getGroupedFeedsByStage(){
+    public Map<String, String> getBusyCages(){
+        Map<String, String> cages = new HashMap<String, String>();
+        Cursor c = db_.rawQuery("select id, sn from cage_info where status != 0 order by sn", null);
+        if (c != null){
+            if (c.moveToFirst()){
+                do {
+                    cages.put(c.getString(1), c.getString(0));
+                }while(c.moveToNext());
+            }
+            c.close();
+        }
+        return cages;
+    }
+
+    public Map<String, List<Map<String, String>>> getGroupedFeedsByDate(){
+        String sql = "select b.id, b.cage_id, a.sn as cage_sn, " +
+                "( " +
+                "case " +
+                "when b.hatch_dt is not null then 1 " +
+                "when b.lay_dt is not null then 0 " +
+                "end " +
+                ") as stage, " +
+                "( " +
+                "case " +
+                "when b.hatch_dt is not null then date(b.hatch_dt) " +
+                "when b.lay_dt is not null then date(b.lay_dt) " +
+                "end " +
+                ") as dt " +
+                "from cage_info a, egg_info b " +
+                "where a.id = b.cage_id  and a.status != 0 and b.status = 0 " +
+                "order by dt desc, cage_sn, stage ";
         Map<String, List<Map<String, String>>> grouped = new LinkedHashMap<String, List<Map<String, String>>>();
+        Cursor c = db_.rawQuery(sql, null);
+        if (c != null){
+            if (c.moveToFirst()){
+                do {
+                    String group_name = c.getString(4);
+                    if (!grouped.containsKey(group_name)){
+                        grouped.put(group_name, new ArrayList<Map<String, String>>());
+                    }
+                    Map<String, String> record = new HashMap<String, String>();
+                    record.put("id", c.getString(0));
+                    record.put("cage_id", c.getString(1));
+                    record.put("cage_sn", c.getString(2));
+                    record.put("stage", c.getString(3));
+                    record.put("dt", c.getString(4));
+                    grouped.get(group_name).add(record);
+                }while(c.moveToNext());
+            }
+            c.close();
+        }
+        return grouped;
+    }
+
+    public Map<String, List<Map<String, String>>> getGroupedFeedsByStage(){
+        String sql = "select b.id, b.cage_id, a.sn as cage_sn, " +
+                "( " +
+                "case " +
+                "when b.hatch_dt is not null then 1 " +
+                "when b.lay_dt is not null then 0 " +
+                "end " +
+                ") as stage, " +
+                "( " +
+                "case " +
+                "when b.hatch_dt is not null then date(b.hatch_dt) " +
+                "when b.lay_dt is not null then date(b.lay_dt) " +
+                "end " +
+                ") as dt " +
+                "from cage_info a, egg_info b " +
+                "where a.id = b.cage_id  and a.status != 0 and b.status = 0 " +
+                "order by stage, dt desc, cage_sn ";
+        Map<String, List<Map<String, String>>> grouped = new LinkedHashMap<String, List<Map<String, String>>>();
+        Cursor c = db_.rawQuery(sql, null);
+        if (c != null){
+            if (c.moveToFirst()){
+                do {
+                    String group_name = c.getString(3);
+                    switch (c.getInt(3)) {
+                        case 0:
+                            group_name = ctx_.getResources().getString(R.string.lay_egg);
+                            break;
+                        case 1:
+                            group_name = ctx_.getResources().getString(R.string.hatch_egg);
+                            break;
+                    }
+                    if (!grouped.containsKey(group_name)){
+                        grouped.put(group_name, new ArrayList<Map<String, String>>());
+                    }
+                    Map<String, String> record = new HashMap<String, String>();
+                    record.put("id", c.getString(0));
+                    record.put("cage_id", c.getString(1));
+                    record.put("cage_sn", c.getString(2));
+                    record.put("stage", c.getString(3));
+                    record.put("dt", c.getString(4));
+                    grouped.get(group_name).add(record);
+                }while(c.moveToNext());
+            }
+            c.close();
+        }
         return grouped;
     }
 

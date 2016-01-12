@@ -34,6 +34,7 @@ public class MainActivity extends TabActivity {
 
     private AlertDialog dlg_filter_cage_;
     private AlertDialog dlg_filter_work_;
+    private AlertDialog dlg_group_feed_;
     private AlertDialog dlg_exit_prompt_;
     private AlertDialog dlg_rebuild_works_;
 
@@ -65,6 +66,15 @@ public class MainActivity extends TabActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         that.filterWorks(which);
                         dlg_filter_work_.hide();
+                    }
+                })
+                .create();
+
+        dlg_group_feed_ = new AlertDialog.Builder(MainActivity.this)
+                .setSingleChoiceItems(R.array.feed_groups, FeedListActivity.GROUPBY_DATE, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        that.groupFeeds(which);
+                        dlg_group_feed_.hide();
                     }
                 })
                 .create();
@@ -111,7 +121,7 @@ public class MainActivity extends TabActivity {
                 .setContent(new Intent(this, CageExpandableListActivity.class)));
         tabHost.addTab(tabHost.newTabSpec("tab_feed")
                 .setIndicator(null, getResources().getDrawable(android.R.drawable.ic_menu_recent_history))
-                .setContent(new Intent(this, MyExpandableListActivity.class)));
+                .setContent(new Intent(this, FeedListActivity.class)));
         tabHost.addTab(tabHost.newTabSpec("tab_work")
                 .setIndicator(null, getResources().getDrawable(android.R.drawable.ic_menu_today))
                 .setContent(new Intent(this, TodayWorkListActivity.class)));
@@ -162,6 +172,9 @@ public class MainActivity extends TabActivity {
             case 4:
                 startActivity(new Intent(MainActivity.this, AddCageActivity.class));
                 break;
+            case 5:
+                startActivity(new Intent(MainActivity.this, AddEggActivity.class));
+                break;
             case 6:
                 ((MyApplication)getApplication()).getDbManager().backup();
                 break;
@@ -182,6 +195,7 @@ public class MainActivity extends TabActivity {
                 dlg_filter_cage_.show();
                 break;
             case 1:
+                dlg_group_feed_.show();
                 break;
             case 2:
                 dlg_filter_work_.show();
@@ -197,6 +211,10 @@ public class MainActivity extends TabActivity {
         ((TodayWorkListActivity)getTabHost().getCurrentView().getContext()).filter(which);
     }
 
+    protected void groupFeeds(int which){
+        ((FeedListActivity)getTabHost().getCurrentView().getContext()).group(which);
+    }
+
     protected void onRefresh(){
         final TabHost tabHost = getTabHost();
         switch (tabHost.getCurrentTab()){
@@ -204,6 +222,7 @@ public class MainActivity extends TabActivity {
                 ((CageExpandableListActivity)getTabHost().getCurrentView().getContext()).refresh();
                 break;
             case 1:
+                ((FeedListActivity)getTabHost().getCurrentView().getContext()).refresh();
                 break;
             case 2:
                 ((TodayWorkListActivity)getTabHost().getCurrentView().getContext()).refresh();
