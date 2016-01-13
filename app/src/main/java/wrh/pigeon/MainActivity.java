@@ -40,7 +40,7 @@ public class MainActivity extends TabActivity {
     private AlertDialog dlg_rebuild_works_;
 
     public static final int REQUEST_CODE = 0x0ba7c0de;
-    private static final String SCAN_INTENT = "com.google.zxing.client.android.barcodescanner.SCAN";
+    private static final String SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,6 +204,7 @@ public class MainActivity extends TabActivity {
             if (resultCode == Activity.RESULT_OK) {
                 String result = intent.getStringExtra("SCAN_RESULT");
                 String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
             }
         }
     }
