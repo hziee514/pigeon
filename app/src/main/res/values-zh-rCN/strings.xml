@@ -28,6 +28,9 @@
     <string name="lbl_status">状态*</string>
     <string name="lbl_cage">笼位*</string>
     <string name="lbl_lay">下蛋*</string>
+    <string name="lbl_num">次数*</string>
+    <string name="lbl_review">检查</string>
+    <string name="lbl_hatch">孵化</string>
     <string name="firstsn_cant_gt_lastsn">起始编号不能大于结束编号</string>
     <string name="msg_exit">您确定要关闭并退出吗？</string>
     <string name="msg_rebuild_works">是否放弃今日工作进度并重新计算今日工作内容？</string>

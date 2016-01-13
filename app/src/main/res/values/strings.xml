@@ -27,6 +27,9 @@
     <string name="lbl_status">Status*</string>
     <string name="lbl_cage">Cage*</string>
     <string name="lbl_lay">Lay*</string>
+    <string name="lbl_num">Times*</string>
+    <string name="lbl_review">Review</string>
+    <string name="lbl_hatch">Hatch</string>
     <string name="firstsn_cant_gt_lastsn">First SN Can not be great than Last SN</string>
     <string name="msg_exit">Do you want to exit anyway?</string>
     <string name="msg_rebuild_works">Do you want to clear today work process and rebuild?</string>

@@ -294,6 +294,22 @@ public class DbManager {
         return grouped;
     }
 
+    public void addEgg(String cage_id, String lay_dt, int num, String review_dt, String hatch_dt){
+        if ("".equals(lay_dt)){
+            lay_dt = null;
+        }
+        if ("".equals(review_dt)){
+            review_dt = null;
+        }
+        if ("".equals(hatch_dt)) {
+            hatch_dt = null;
+        }
+        db_.execSQL(
+                "insert into egg_info(cage_id,lay_dt,num,review_dt,hatch_dt,status) values(?,?,?,?,?,0)",
+                new Object[] { cage_id, lay_dt, num, review_dt, hatch_dt }
+        );
+    }
+
     public Boolean rebuildTodayWorks(){
         db_.beginTransaction();
         try {

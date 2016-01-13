@@ -27,6 +27,10 @@ public class AddEggActivity extends Activity {
 
     private Map<String, String> busy_cages_;
 
+    private static final String[] times = {
+        "1","2"
+    };
+
     public static String getDate(int y, int m, int d){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
@@ -44,16 +48,30 @@ public class AddEggActivity extends Activity {
         return c;
     }
 
-    public void onClickLaydt(View view){
-        final EditText laydtEdit = (EditText)view;
-        String text = laydtEdit.getText().toString();
+    public void onClickDateEdit(View view){
+        final EditText editText = (EditText)view;
+        String text = editText.getText().toString();
         final Calendar c = getCalendar(text);
-        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+        final DatePickerDialog dlg = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                laydtEdit.setText(getDate(year, monthOfYear, dayOfMonth));
+
             }
-        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+        dlg.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        dlg.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DatePicker picker = dlg.getDatePicker();
+                editText.setText(getDate(picker.getYear(), picker.getMonth(), picker.getDayOfMonth()));
+            }
+        });
+        dlg.show();
     }
 
     @Override
@@ -74,6 +92,9 @@ public class AddEggActivity extends Activity {
         final Calendar c = Calendar.getInstance();
         final EditText laydtEdit = (EditText) findViewById(R.id.laydt);
         laydtEdit.setText(getDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)));
+
+        Spinner numSpinner = (Spinner)findViewById(R.id.num);
+        numSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, times));
     }
 
     @Override
@@ -87,15 +108,32 @@ public class AddEggActivity extends Activity {
         final Calendar c = Calendar.getInstance();
         switch (item.getItemId()) {
             case 1:
-                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-                    }
-                }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+                doSave();
                 break;
         }
         return true;
+    }
+
+    public void doSave(){
+        Spinner cageSpinner = (Spinner)findViewById(R.id.cagesn);
+        String cagesn = cageSpinner.getSelectedItem().toString();
+        String cageid = busy_cages_.get(cagesn);
+
+        EditText laydtEdit = (EditText)findViewById(R.id.laydt);
+        String laydt = laydtEdit.getText().toString();
+
+        Spinner numSpinner = (Spinner)findViewById(R.id.num);
+        int num = (int)numSpinner.getSelectedItemId() + 1;
+
+        EditText reviewdtEdit = (EditText)findViewById(R.id.reviewdt);
+        String reviewdt = reviewdtEdit.getText().toString();
+
+        EditText hatchdtEdit = (EditText)findViewById(R.id.hatchdt);
+        String hatchdt = hatchdtEdit.getText().toString();
+
+        DbManager dbm = ((MyApplication)getApplication()).getDbManager();
+        dbm.addEgg(cageid, laydt, num, reviewdt, hatchdt);
+        finish();
     }
 
 }

@@ -1,6 +1,7 @@
 package wrh.pigeon;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
@@ -37,6 +38,9 @@ public class MainActivity extends TabActivity {
     private AlertDialog dlg_group_feed_;
     private AlertDialog dlg_exit_prompt_;
     private AlertDialog dlg_rebuild_works_;
+
+    public static final int REQUEST_CODE = 0x0ba7c0de;
+    private static final String SCAN_INTENT = "com.google.zxing.client.android.barcodescanner.SCAN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +173,12 @@ public class MainActivity extends TabActivity {
             case 2:
                 onRefresh();
                 break;
+            case 3:
+                Intent intentScan = new Intent(SCAN_INTENT);
+                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+                intentScan.setPackage(getApplicationContext().getPackageName());
+                startActivityForResult(intentScan, REQUEST_CODE);
+                break;
             case 4:
                 startActivity(new Intent(MainActivity.this, AddCageActivity.class));
                 break;
@@ -186,6 +196,16 @@ public class MainActivity extends TabActivity {
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == REQUEST_CODE){
+            if (resultCode == Activity.RESULT_OK) {
+                String result = intent.getStringExtra("SCAN_RESULT");
+                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+            }
+        }
     }
 
     protected void onFilter(){

@@ -114,6 +114,10 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
         );
         setListAdapter(adapter_);
 
+        if (group_data.size() > 0) {
+            getExpandableListView().expandGroup(0);
+        }
+
         dlg_loading_.hide();
 
         Log.d(LOG_NAME, "refreshed");
