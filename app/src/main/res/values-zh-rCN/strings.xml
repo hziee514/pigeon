@@ -11,12 +11,13 @@
     <string name="work_sell">检查出栏</string>
     <string name="loading">正在加载...</string>
     <string name="save">保存</string>
+    <string name="delete">删除</string>
     <string name="filter">过滤</string>
     <string name="refresh">刷新</string>
     <string name="scan">扫二维码</string>
     <string name="add_cage">添加笼位</string>
     <string name="add_egg">添加鸽蛋</string>
-    <string name="backup">备份</string>
+    <string name="backup">数据备份</string>
     <string name="rebuild_today_works">今日工作</string>
     <string name="lay_egg">下蛋</string>
     <string name="hatch_egg">孵化</string>
@@ -36,6 +37,10 @@
     <string name="msg_rebuild_works">是否放弃今日工作进度并重新计算今日工作内容？</string>
     <string name="msg_backup_succ">数据库备份成功</string>
     <string name="msg_backup_fail">数据库备份失败</string>
+    <string name="msg_invalid_barcode">无效的数据：</string>
+    <string name="msg_add_cage_to_manager">还没有这个笼位，是否加入管理?</string>
+    <string name="msg_del_cage">您确定要删除这个笼位及相关的数据吗？</string>
+    <string name="msg_del_egg">您确定要删除这条养殖记录吗？</string>
 
     <string name="bookmark_picker_name">书签</string>
     <string name="button_add_calendar">添加事件至日历</string>

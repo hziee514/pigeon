@@ -10,6 +10,7 @@
     <string name="work_sell">Sell</string>
     <string name="loading">Loading...</string>
     <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="filter">Filter</string>
     <string name="refresh">Refresh</string>
     <string name="scan">Scan BarCode</string>
@@ -35,6 +36,10 @@
     <string name="msg_rebuild_works">Do you want to clear today work process and rebuild?</string>
     <string name="msg_backup_succ">Backup database success</string>
     <string name="msg_backup_fail">Backup database failed</string>
+    <string name="msg_invalid_barcode">Invalid data:</string>
+    <string name="msg_add_cage_to_manager">This cage is not managed, do your want to add it first?</string>
+    <string name="msg_del_cage">Are you sure to delete all data of this cage?</string>
+    <string name="msg_del_egg">Are you sure to delete this feed record?</string>
 
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>

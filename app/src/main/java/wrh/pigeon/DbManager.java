@@ -206,6 +206,44 @@ public class DbManager {
         return cages;
     }
 
+    public Map<String, String> getCageBySN(String sn){
+        Map<String, String> cage = new HashMap<String, String>();
+        Cursor c = db_.rawQuery("select id, status from cage_info where sn=?", new String[]{sn});
+        if (c != null){
+            if (c.moveToFirst()){
+                cage.put("id", c.getString(0));
+                cage.put("sn", sn);
+                cage.put("status", c.getString(1));
+            }
+            c.close();
+        }
+        return cage;
+    }
+
+    public Map<String, String> addCage(String sn){
+        db_.execSQL("insert into cage_info(sn,status,create_dt) values(?,1,datetime('now'))", new String[]{sn});
+        return getCageBySN(sn);
+    }
+
+    public void updateCage(String id, int status){
+        db_.execSQL("update cage_info set status=? where id=?", new Object[]{status, id});
+    }
+
+    public void deleteCage(String id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("delete from today_works where cage_id=?", new String[]{id});
+            db_.execSQL("delete from egg_info where cage_id=?", new String[]{id});
+            db_.execSQL("delete from cage_info where id=?", new String[]{id});
+            db_.setTransactionSuccessful();
+        } catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        } finally {
+            db_.endTransaction();
+        }
+    }
+
     public Map<String, List<Map<String, String>>> getGroupedFeedsByDate(){
         String sql = "select b.id, b.cage_id, a.sn as cage_sn, " +
                 "( " +
@@ -308,6 +346,41 @@ public class DbManager {
                 "insert into egg_info(cage_id,lay_dt,num,review_dt,hatch_dt,status) values(?,?,?,?,?,0)",
                 new Object[] { cage_id, lay_dt, num, review_dt, hatch_dt }
         );
+    }
+
+    public Map<String,String> getEgg(String id){
+        Map<String,String> egg = new HashMap<String,String>();
+        return egg;
+    }
+
+    public Boolean addEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public void deleteEgg(String id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("delete from today_works where egg_id=?", new String[]{id});
+            db_.execSQL("delete from egg_info where id=?", new String[]{id});
+            db_.setTransactionSuccessful();
+        } catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        } finally {
+            db_.endTransaction();
+        }
     }
 
     public Boolean rebuildTodayWorks(){
@@ -420,22 +493,6 @@ public class DbManager {
         try {
             db_.execSQL("insert into egg_info(cage_id,num,lay_dt,status) values(?,1,datetime('now'),0)", new String[]{cage_id});
             db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[]{work_id});
-            db_.setTransactionSuccessful();
-            return true;
-        }catch (SQLException e){
-            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-            return false;
-        }finally {
-            db_.endTransaction();
-        }
-    }
-
-    public Boolean addEgg(String work_id, String egg_id){
-        db_.beginTransaction();
-        try {
-            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){

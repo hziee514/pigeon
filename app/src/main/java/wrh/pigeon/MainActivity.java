@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class MainActivity extends TabActivity {
 
@@ -203,10 +204,49 @@ public class MainActivity extends TabActivity {
         if (requestCode == REQUEST_CODE){
             if (resultCode == Activity.RESULT_OK) {
                 String result = intent.getStringExtra("SCAN_RESULT");
-                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-                Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+                //String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                //Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+                handleBarcode(result);
             }
         }
+    }
+
+    private Pattern pattern_ = Pattern.compile("^[0-9]{2}-[0-9]{2}-[1-9][0-9]{2}$");
+
+    private void handleBarcode(final String barcode){
+        if (!pattern_.matcher(barcode).matches()){
+            Toast.makeText(this, getResources().getString(R.string.msg_invalid_barcode) + barcode, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final DbManager dbm = ((MyApplication)getApplication()).getDbManager();
+        Map<String, String> cage = dbm.getCageBySN(barcode);
+        if (cage.size() == 0){
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.msg_add_cage_to_manager)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            showCage(dbm.addCage(barcode));
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        }
+                    })
+                    .create()
+                    .show();
+        } else {
+            showCage(cage);
+        }
+    }
+
+    private void showCage(Map<String, String> cage){
+        //Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, CageInfoActivity.class);
+        intent.putExtra("id", cage.get("id"));
+        intent.putExtra("sn", cage.get("sn"));
+        intent.putExtra("status", cage.get("status"));
+        startActivity(intent);
     }
 
     protected void onFilter(){

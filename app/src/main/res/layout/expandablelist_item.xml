@@ -48,6 +48,6 @@
         android:layout_height="wrap_content"
         android:contentDescription=""
         android:visibility="gone"
-        android:paddingRight="8dp"/>
+        android:padding="5dp"/>
 
 </LinearLayout>

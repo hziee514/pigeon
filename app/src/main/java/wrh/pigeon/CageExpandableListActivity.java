@@ -3,6 +3,7 @@ package wrh.pigeon;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -136,13 +137,18 @@ public class CageExpandableListActivity extends ExpandableListActivity implement
     @Override
     public void onMyItemClick(View view, int groupPosition, int childPosition) {
         Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
-        Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(CageExpandableListActivity.this, CageInfoActivity.class);
+        intent.putExtra("id", cage.get("id"));
+        intent.putExtra("sn", cage.get("sn"));
+        intent.putExtra("status", cage.get("status"));
+        startActivity(intent);
     }
 
     @Override
     public void onMyItemLongClick(View view, int groupPosition, int childPosition) {
-        Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
-        Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
+        //Map<String, String> cage = cages_.get(groupPosition).get(childPosition);
+        //Toast.makeText(this, cage.get("sn"), Toast.LENGTH_SHORT).show();
     }
 
     @Override

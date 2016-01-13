@@ -5,10 +5,12 @@ import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -64,6 +66,12 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
             }
             TextView textView = (TextView)view.findViewById(R.id.text2);
             textView.setText(getWorkTypeRes(record.get("work_type")));
+            ImageButton imageButton = (ImageButton)view.findViewById(R.id.btn_disclosure);
+            if (record.get("egg_id") != null && !"".equals(record.get("egg_id"))){
+                imageButton.setVisibility(View.VISIBLE);
+            } else {
+                imageButton.setVisibility(View.INVISIBLE);
+            }
             return view;
         }
     }
@@ -143,7 +151,13 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
 
     @Override
     public void onMyItemClick(View view, int groupPosition, int childPosition) {
-
+        Map<String, String> work = works_.get(groupPosition).get(childPosition);
+        if (work.get("egg_id") == null || "".equals(work.get("egg_id"))) {
+            return;
+        }
+        Intent intent = new Intent(TodayWorkListActivity.this, EggInfoActivity.class);
+        intent.putExtra("id", work.get("egg_id"));
+        startActivity(intent);
     }
 
     @Override

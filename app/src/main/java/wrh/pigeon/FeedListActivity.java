@@ -3,6 +3,7 @@ package wrh.pigeon;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -128,7 +129,10 @@ public class FeedListActivity extends ExpandableListActivity implements OnMyItem
 
     @Override
     public void onMyItemClick(View view, int groupPosition, int childPosition) {
-
+        Map<String, String> egg = store_.get(groupPosition).get(childPosition);
+        Intent intent = new Intent(FeedListActivity.this, EggInfoActivity.class);
+        intent.putExtra("id", egg.get("id"));
+        startActivity(intent);
     }
 
     @Override
