@@ -37,7 +37,6 @@ public class MainActivity extends TabActivity {
     private AlertDialog dlg_filter_cage_;
     private AlertDialog dlg_filter_work_;
     private AlertDialog dlg_group_feed_;
-    private AlertDialog dlg_exit_prompt_;
     private AlertDialog dlg_rebuild_works_;
 
     public static final int REQUEST_CODE = 0x0ba7c0de;
@@ -84,23 +83,6 @@ public class MainActivity extends TabActivity {
                 })
                 .create();
 
-        dlg_exit_prompt_ = new AlertDialog.Builder(MainActivity.this)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setTitle(R.string.msg_exit)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        that.finish();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .create();
-
         dlg_rebuild_works_ = new AlertDialog.Builder(MainActivity.this)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setTitle(R.string.msg_rebuild_works)
@@ -135,7 +117,23 @@ public class MainActivity extends TabActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK){
-            dlg_exit_prompt_.show();
+            final MainActivity that = this;
+            new AlertDialog.Builder(MainActivity.this)
+                    .setIconAttribute(android.R.attr.alertDialogIcon)
+                    .setTitle(R.string.msg_exit)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            that.finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .create()
+                    .show();
             return true;
         }
         return super.dispatchKeyEvent(event);

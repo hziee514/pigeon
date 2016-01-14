@@ -33,8 +33,8 @@ public class DbManager {
 
     private SQLiteDatabase db_ = null;
 
-    private static final String db_name_ = "/gezi/gezi.db";
-    private static final String bdb_name_ = "/gezi/backup.db";
+    private static final String db_dir_ = "/gezi/";
+    private static final String db_name_ = "gezi.db";
     private static final String LOG_NAME = "DbManager";
 
     private Context ctx_ = null;
@@ -45,20 +45,23 @@ public class DbManager {
 
     public static String getSdcardPath(String sub){
         return Environment.getExternalStorageDirectory().getAbsolutePath() + sub;
-        //return "/sdcard" + sub;
     }
 
     public DbManager(Context ctx){
         ctx_ = ctx;
         open();
-        //backup();
     }
 
     public void open(){
         if(db_ != null){
             return;
         }
-        db_ = SQLiteDatabase.openDatabase(getSdcardPath(db_name_), null, SQLiteDatabase.CREATE_IF_NECESSARY);
+        File dbdir = new File(getSdcardPath(db_dir_));
+        if (!dbdir.exists()){
+            dbdir.mkdirs();
+        }
+
+        db_ = SQLiteDatabase.openDatabase(getSdcardPath(db_dir_+db_name_), null, SQLiteDatabase.CREATE_IF_NECESSARY);
         db_.execSQL("create table if not exists cage_info(id INTEGER PRIMARY KEY,sn TEXT UNIQUE,status INTEGER,create_dt DATETIME)");
         db_.execSQL("create table if not exists egg_info(id INTEGER PRIMARY KEY,cage_id INTEGER, num INTEGER,lay_dt DATETIME,review_dt DATETIME,hatch_dt DATETIME,off_dt DATETIME,status INTEGER,fin_dt DATETIME)");
         db_.execSQL("create table if not exists today_works(id INTEGER PRIMARY KEY,cage_id INTEGER,egg_id INTEGER,work_type INTEGER,create_dt DATETIME,fin_dt DATETIME)");
@@ -118,8 +121,8 @@ public class DbManager {
     }
 
     public void backup(){
-        File dbfile = new File(getSdcardPath(db_name_));
-        File bdbfile = new File(getSdcardPath("/gezi/backup"+getTimeStamp()+".db"));
+        File dbfile = new File(getSdcardPath(db_dir_+db_name_));
+        File bdbfile = new File(getSdcardPath(db_dir_+"backup"+getTimeStamp()+".db"));
 
         if (bdbfile.exists()){
             bdbfile.delete();
@@ -350,23 +353,35 @@ public class DbManager {
 
     public Map<String,String> getEgg(String id){
         Map<String,String> egg = new HashMap<String,String>();
+        Cursor c = db_.rawQuery("select num,lay_dt,review_dt,hatch_dt,off_dt from egg_info where id=?", new String[]{id});
+        if (c != null){
+            if (c.moveToFirst()){
+                egg.put("id", id);
+                egg.put("num", c.getString(0));
+                egg.put("lay_dt", c.getString(1));
+                egg.put("review_dt", c.getString(2));
+                egg.put("hatch_dt", c.getString(3));
+                egg.put("off_dt", c.getString(4));
+            }
+            c.close();
+        }
         return egg;
     }
 
-    public Boolean addEgg(String work_id, String egg_id){
-        db_.beginTransaction();
-        try {
-            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
-            db_.setTransactionSuccessful();
-            return true;
-        }catch (SQLException e){
-            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-            return false;
-        }finally {
-            db_.endTransaction();
+    public void updateEgg(String id, String lay_dt, int num, String review_dt, String hatch_dt){
+        if ("".equals(lay_dt)){
+            lay_dt = null;
         }
+        if ("".equals(review_dt)){
+            review_dt = null;
+        }
+        if ("".equals(hatch_dt)) {
+            hatch_dt = null;
+        }
+        db_.execSQL(
+                "update egg_info set lay_dt=?,num=?,review_dt=?,hatch_dt=? where id=?",
+                new Object[]{lay_dt,num,review_dt,hatch_dt,id}
+        );
     }
 
     public void deleteEgg(String id){
@@ -398,11 +413,11 @@ public class DbManager {
             //孵化后第14天后要检查下蛋
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, b.id as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
                     "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now') ");
 
-            //下第一个蛋后2天内（明天，后天）检查下蛋
+            //下第一个蛋后2天内（明天，后天）下第二个蛋
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
                     "select distinct a.id as cage_id, b.id as egg_id, 1 as work_type, datetime('now') as create_dt, null as fin_dt " +
@@ -414,14 +429,14 @@ public class DbManager {
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
                     "select distinct a.id as cage_id, b.id as egg_id, 2 as work_type, datetime('now') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '3 day') < date('now') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '3 day') < date('now') and date(b.lay_dt, '17 day') > date('now') and b.review_dt is null and b.hatch_dt is null ");
 
             //下第二个蛋后第17天检查孵化了没有
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
                     "select distinct a.id as cage_id, b.id as egg_id, 3 as work_type, datetime('now') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '17 day') <= date('now') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '17 day') <= date('now') and b.hatch_dt is null ");
 
             //孵化后第28天出栏
             db_.execSQL(
@@ -493,6 +508,22 @@ public class DbManager {
         try {
             db_.execSQL("insert into egg_info(cage_id,num,lay_dt,status) values(?,1,datetime('now'),0)", new String[]{cage_id});
             db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[]{work_id});
+            db_.setTransactionSuccessful();
+            return true;
+        }catch (SQLException e){
+            Toast.makeText(ctx_, e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return false;
+        }finally {
+            db_.endTransaction();
+        }
+    }
+
+    public Boolean addEgg(String work_id, String egg_id){
+        db_.beginTransaction();
+        try {
+            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){

@@ -157,6 +157,8 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
         }
         Intent intent = new Intent(TodayWorkListActivity.this, EggInfoActivity.class);
         intent.putExtra("id", work.get("egg_id"));
+        intent.putExtra("cage_sn", work.get("cage_sn"));
+        intent.putExtra("cage_id", work.get("cage_id"));
         startActivity(intent);
     }
 

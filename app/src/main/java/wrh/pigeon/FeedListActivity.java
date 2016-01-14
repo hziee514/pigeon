@@ -132,6 +132,8 @@ public class FeedListActivity extends ExpandableListActivity implements OnMyItem
         Map<String, String> egg = store_.get(groupPosition).get(childPosition);
         Intent intent = new Intent(FeedListActivity.this, EggInfoActivity.class);
         intent.putExtra("id", egg.get("id"));
+        intent.putExtra("cage_sn", egg.get("cage_sn"));
+        intent.putExtra("cage_id", egg.get("cage_id"));
         startActivity(intent);
     }
 

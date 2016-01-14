@@ -1,5 +1,6 @@
 package wrh.pigeon;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -27,7 +30,7 @@ public class AddEggActivity extends Activity {
 
     private Map<String, String> busy_cages_;
 
-    private static final String[] times = {
+    public static final String[] times = {
         "1","2"
     };
 
@@ -77,6 +80,10 @@ public class AddEggActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
         setContentView(R.layout.activity_addegg);
 
         DbManager dbm = ((MyApplication)getApplication()).getDbManager();
