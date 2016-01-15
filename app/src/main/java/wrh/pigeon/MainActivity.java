@@ -66,7 +66,7 @@ public class MainActivity extends TabActivity {
                 .create();
 
         dlg_filter_work_ = new AlertDialog.Builder(MainActivity.this)
-                .setSingleChoiceItems(R.array.work_filters, TodayWorkListActivity.FILTER_ALL, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(R.array.work_filters, TodayWorkListActivity.FILTER_WAIT, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         that.filterWorks(which);
                         dlg_filter_work_.hide();

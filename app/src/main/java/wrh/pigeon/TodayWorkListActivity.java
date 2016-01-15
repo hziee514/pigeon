@@ -102,7 +102,7 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
     public static final int FILTER_FIN = 1;
     public static final int FILTER_ALL = 2;
 
-    private int filter_status = FILTER_ALL;
+    private int filter_status = FILTER_WAIT;
 
     public void filter(int which){
         filter_status = which;

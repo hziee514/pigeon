@@ -65,7 +65,7 @@ public class DbManager {
         db_.execSQL("create table if not exists cage_info(id INTEGER PRIMARY KEY,sn TEXT UNIQUE,status INTEGER,create_dt DATETIME)");
         db_.execSQL("create table if not exists egg_info(id INTEGER PRIMARY KEY,cage_id INTEGER, num INTEGER,lay_dt DATETIME,review_dt DATETIME,hatch_dt DATETIME,off_dt DATETIME,status INTEGER,fin_dt DATETIME)");
         db_.execSQL("create table if not exists today_works(id INTEGER PRIMARY KEY,cage_id INTEGER,egg_id INTEGER,work_type INTEGER,create_dt DATETIME,fin_dt DATETIME)");
-        db_.execSQL("delete from today_works where date(create_dt) < date('now')");
+        db_.execSQL("delete from today_works where date(create_dt) < date('now','localtime')");
         Log.d(LOG_NAME, "onCreate: db created");
     }
 
@@ -136,7 +136,7 @@ public class DbManager {
     }
 
     public Boolean batchAddCages(String roomId, String groupId, String layerId, int firstSn, int lastSn, int status){
-        String sql = "insert into cage_info(sn,status,create_dt) values(?,?,datetime('now'))";
+        String sql = "insert into cage_info(sn,status,create_dt) values(?,?,datetime('now','localtime'))";
         String sn = "";
         db_.beginTransaction();
         try {
@@ -224,7 +224,7 @@ public class DbManager {
     }
 
     public Map<String, String> addCage(String sn){
-        db_.execSQL("insert into cage_info(sn,status,create_dt) values(?,1,datetime('now'))", new String[]{sn});
+        db_.execSQL("insert into cage_info(sn,status,create_dt) values(?,1,datetime('now','localtime'))", new String[]{sn});
         return getCageBySN(sn);
     }
 
@@ -406,44 +406,44 @@ public class DbManager {
             //没下蛋的要检查下蛋
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a " +
                     "where a.status != 0 and a.id not in(select distinct cage_id from egg_info x where x.status = 0) ");
 
             //孵化后第14天后要检查下蛋
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now','localtime') ");
 
             //下第一个蛋后2天内（明天，后天）下第二个蛋
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, b.id as egg_id, 1 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 1 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 1 and b.lay_dt is not null and date(b.lay_dt) < date('now') and date(b.lay_dt, '2 day') >= date('now') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 1 and b.lay_dt is not null and date(b.lay_dt) < date('now','localtime') and date(b.lay_dt, '2 day') >= date('now','localtime') ");
 
             //下第二个蛋后第4天检查蛋的好坏
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, b.id as egg_id, 2 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 2 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '3 day') < date('now') and date(b.lay_dt, '17 day') > date('now') and b.review_dt is null and b.hatch_dt is null ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '3 day') < date('now','localtime') and date(b.lay_dt, '17 day') > date('now','localtime') and b.review_dt is null and b.hatch_dt is null ");
 
             //下第二个蛋后第17天检查孵化了没有
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, b.id as egg_id, 3 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 3 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '17 day') <= date('now') and b.hatch_dt is null ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.lay_dt is not null and date(b.lay_dt, '17 day') <= date('now','localtime') and b.hatch_dt is null ");
 
             //孵化后第28天出栏
             db_.execSQL(
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
-                    "select distinct a.id as cage_id, b.id as egg_id, 4 as work_type, datetime('now') as create_dt, null as fin_dt " +
+                    "select distinct a.id as cage_id, b.id as egg_id, 4 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.hatch_dt is not null and date(b.hatch_dt, '27 day') <= date('now') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.num = 2 and b.hatch_dt is not null and date(b.hatch_dt, '27 day') <= date('now','localtime') ");
 
             db_.setTransactionSuccessful();
             return true;
@@ -462,20 +462,20 @@ public class DbManager {
             case TodayWorkListActivity.FILTER_WAIT:
                 sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
                         "from today_works a, cage_info b " +
-                        "where a.cage_id = b.id and date(a.create_dt) = date('now') and a.fin_dt is null " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now','localtime') and a.fin_dt is null " +
                         "order by catelog, cage_sn, work_type, fin_dt ";
                 break;
             case TodayWorkListActivity.FILTER_FIN:
                 sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
                         "from today_works a, cage_info b " +
-                        "where a.cage_id = b.id and date(a.create_dt) = date('now') and a.fin_dt is not null " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now','localtime') and a.fin_dt is not null " +
                         "order by catelog, cage_sn, work_type, fin_dt ";
                 break;
             case TodayWorkListActivity.FILTER_ALL:
             default:
                 sql = "select distinct a.id, a.cage_id, b.sn as cage_sn, a.egg_id, a.work_type, a.fin_dt, substr(b.sn,1,5) as catelog " +
                         "from today_works a, cage_info b " +
-                        "where a.cage_id = b.id and date(a.create_dt) = date('now') " +
+                        "where a.cage_id = b.id and date(a.create_dt) = date('now','localtime') " +
                         "order by catelog, cage_sn, work_type, fin_dt ";
                 break;
         }
@@ -506,8 +506,8 @@ public class DbManager {
     public Boolean addFirstEgg(String work_id, String cage_id){
         db_.beginTransaction();
         try {
-            db_.execSQL("insert into egg_info(cage_id,num,lay_dt,status) values(?,1,datetime('now'),0)", new String[]{cage_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[]{work_id});
+            db_.execSQL("insert into egg_info(cage_id,num,lay_dt,status) values(?,1,datetime('now','localtime'),0)", new String[]{cage_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[]{work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){
@@ -522,8 +522,8 @@ public class DbManager {
     public Boolean addEgg(String work_id, String egg_id){
         db_.beginTransaction();
         try {
-            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.execSQL("update egg_info set num=2,lay_dt=datetime('now','localtime') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){
@@ -538,8 +538,8 @@ public class DbManager {
     public Boolean reviewEgg(String work_id, String egg_id){
         db_.beginTransaction();
         try {
-            db_.execSQL("update egg_info set review_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.execSQL("update egg_info set review_dt=datetime('now','localtime') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){
@@ -554,8 +554,8 @@ public class DbManager {
     public Boolean hatchEgg(String work_id, String egg_id){
         db_.beginTransaction();
         try {
-            db_.execSQL("update egg_info set hatch_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.execSQL("update egg_info set hatch_dt=datetime('now','localtime') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){
@@ -570,8 +570,8 @@ public class DbManager {
     public Boolean offEgg(String work_id, String egg_id){
         db_.beginTransaction();
         try {
-            db_.execSQL("update egg_info set status=1,off_dt=datetime('now') where id=?", new String[]{egg_id});
-            db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+            db_.execSQL("update egg_info set status=1,off_dt=datetime('now','localtime') where id=?", new String[]{egg_id});
+            db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[] {work_id});
             db_.setTransactionSuccessful();
             return true;
         }catch (SQLException e){
@@ -584,6 +584,6 @@ public class DbManager {
     }
 
     public void finWork(String work_id){
-        db_.execSQL("update today_works set fin_dt=datetime('now') where id=?", new String[] {work_id});
+        db_.execSQL("update today_works set fin_dt=datetime('now','localtime') where id=?", new String[] {work_id});
     }
 }
