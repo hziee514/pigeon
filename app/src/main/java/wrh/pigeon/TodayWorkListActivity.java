@@ -120,9 +120,9 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
 
         for(Map.Entry<String, List<Map<String, String>>> groupEntry : grouped.entrySet()){
             Map<String, String> group_info = new HashMap<String, String>();
-            group_info.put("name", groupEntry.getKey());
-            group_data.add(group_info);
             List<Map<String, String>> children = groupEntry.getValue();
+            group_info.put("name", groupEntry.getKey() + "(" + children.size() + ")");
+            group_data.add(group_info);
             works_.add(children);
         }
 
@@ -140,9 +140,9 @@ public class TodayWorkListActivity extends ExpandableListActivity implements OnM
         );
         setListAdapter(adapter_);
 
-        if (group_data.size() > 0) {
+        /*if (group_data.size() > 0) {
             getExpandableListView().expandGroup(0);
-        }
+        }*/
 
         dlg_loading_.hide();
 

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -228,6 +229,42 @@ public class DbManager {
         return getCageBySN(sn);
     }
 
+    public  List<Map<String, String>> getCageHistory(String sn){
+        List<Map<String, String>> history = new ArrayList<Map<String, String>>();
+        String sql = "select distinct b.id, " +
+                "( " +
+                "case " +
+                "when b.off_dt is not null then 2 " +
+                "when b.hatch_dt is not null then 1 " +
+                "when b.lay_dt is not null then 0 " +
+                "end " +
+                ") as stage, " +
+                "( " +
+                "case " +
+                "when b.off_dt is not null then date(b.off_dt) " +
+                "when b.hatch_dt is not null then date(b.hatch_dt) " +
+                "when b.lay_dt is not null then date(b.lay_dt) " +
+                "end " +
+                ") as dt " +
+                "from cage_info a, egg_info b " +
+                "where a.id = b.cage_id and a.status != 0 and b.status in (0,1) and a.sn = ? " +
+                "order by dt desc";
+        Cursor c = db_.rawQuery(sql, new String[] {sn});
+        if (c != null){
+            if (c.moveToFirst()){
+                do {
+                    Map<String, String> r = new HashMap<String, String>();
+                    r.put("id", c.getString(0));
+                    r.put("stage", c.getString(1));
+                    r.put("dt", c.getString(2));
+                    history.add(r);
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+        return history;
+    }
+
     public void updateCage(String id, int status){
         db_.execSQL("update cage_info set status=? where id=?", new Object[]{status, id});
     }
@@ -415,7 +452,10 @@ public class DbManager {
                     "insert into today_works(cage_id, egg_id, work_type, create_dt, fin_dt) " +
                     "select distinct a.id as cage_id, null as egg_id, 0 as work_type, datetime('now','localtime') as create_dt, null as fin_dt " +
                     "from cage_info a , egg_info b " +
-                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now','localtime') ");
+                    "where a.status != 0 and a.id = b.cage_id and b.status = 0 and b.hatch_dt is not null and date(b.hatch_dt,'14 day') < date('now','localtime') " +
+                    "and a.id not in( " +
+                    "select cage_id from egg_info where status=0 and lay_dt is not null and (hatch_dt is null or date(hatch_dt,'14 day') >= date('now','localtime')) " +
+                    ") ");
 
             //下第一个蛋后2天内（明天，后天）下第二个蛋
             db_.execSQL(

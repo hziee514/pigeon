@@ -20,6 +20,7 @@
     <string name="rebuild_today_works">Rebuild Today Works</string>
     <string name="lay_egg">Lay Egg</string>
     <string name="hatch_egg">Hatch Egg</string>
+    <string name="sell_egg">Sell Egg</string>
     <string name="lbl_room">Room*</string>
     <string name="lbl_group">Group*</string>
     <string name="lbl_layer">Layer*</string>
@@ -40,6 +41,7 @@
     <string name="msg_add_cage_to_manager">This cage is not managed, do your want to add it first?</string>
     <string name="msg_del_cage">Are you sure to delete all data of this cage?</string>
     <string name="msg_del_egg">Are you sure to delete this feed record?</string>
+    <string name="txt_feed_record">Feed Record</string>
 
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>

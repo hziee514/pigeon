@@ -2,25 +2,67 @@ package wrh.pigeon;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class CageInfoActivity extends Activity {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CageInfoActivity extends Activity implements OnMyItemClickLisener {
+
+    public class CageHistoryListAdapter extends MyExpandableListAdapter{
+        public CageHistoryListAdapter(Context context,
+                               List<? extends Map<String, ?>> groupData,
+                               int groupLayout,
+                               String[] groupFrom,
+                               int[] groupTo,
+                               List<? extends List<? extends Map<String, ?>>> childData,
+                               int childLayout,
+                               String[] childFrom,
+                               int[] childTo,
+                               OnMyItemClickLisener listener) {
+            super(context, groupData, groupLayout, groupFrom, groupTo, childData, childLayout, childFrom, childTo, listener);
+        }
+
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            View view = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
+            Map<String, String> r = store_.get(groupPosition).get(childPosition);
+            TextView textView = (TextView)view.findViewById(R.id.text2);
+            if ("0".equals(r.get("stage"))){
+                textView.setText(R.string.lay_egg);
+            } else if ("1".equals(r.get("stage"))) {
+                textView.setText(R.string.hatch_egg);
+            } else if ("2".equals(r.get("stage"))) {
+                textView.setText(R.string.sell_egg);
+                textView.setTextColor(Color.GREEN);
+            }
+            return view;
+        }
+    }
 
     private Boolean initing_ = true;
+    private CageHistoryListAdapter adapter_;
+    private List<List<Map<String, String>>> store_ = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +91,38 @@ public class CageInfoActivity extends Activity {
                     initing_ = false;
                     return;
                 }
-                dbm.updateCage(cage_id, (int)id);
+                dbm.updateCage(cage_id, (int) id);
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        List<Map<String, String>> group_data = new ArrayList<Map<String, String>>();
+        store_ = new ArrayList<List<Map<String, String>>>();
+
+        Map<String, String> group_info = new HashMap<String, String>();
+        List<Map<String, String>> children = dbm.getCageHistory(intent.getStringExtra("sn"));
+        store_.add(children);
+        group_info.put("name", getResources().getString(R.string.txt_feed_record) + "(" + children.size() + ")");
+        group_data.add(group_info);
+
+        ExpandableListView listView = (ExpandableListView)findViewById(R.id.history);
+        adapter_ = new CageHistoryListAdapter(
+                this,
+                group_data,
+                R.layout.expandablelist_group,
+                new String[] { "name" },
+                new int[] { R.id.group_name },
+                store_,
+                R.layout.expandablelist_item,
+                new String[] { "dt", "stage" },
+                new int[] { R.id.text1, R.id.text2 },
+                this
+        );
+        listView.setAdapter(adapter_);
+        listView.expandGroup(0);
     }
 
     @Override
@@ -98,4 +166,18 @@ public class CageInfoActivity extends Activity {
                 .show();
     }
 
+    @Override
+    public void onMyItemClick(View view, int groupPosition, int childPosition) {
+
+    }
+
+    @Override
+    public void onMyItemLongClick(View view, int groupPosition, int childPosition) {
+
+    }
+
+    @Override
+    public void onMyItemDisclosure(View view, int groupPosition, int childPosition) {
+
+    }
 }
