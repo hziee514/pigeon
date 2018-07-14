@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <android.support.v7.widget.GridLayout
+        app:rowCount="6"
+        app:columnCount="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="@string/lbl_room"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/room"
+            tools:entries="@array/rooms"
+            android:gravity="center_vertical|end"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_group"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/group"
+            tools:entries="@array/groups"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_layer"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/layer"
+            tools:entries="@array/layers"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_first"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/first"
+            tools:entries="@array/sns"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_last"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/last"
+            tools:entries="@array/sns"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_status"
+            app:layout_columnWeight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <Spinner
+            android:id="@+id/status"
+            tools:entries="@array/status"
+            app:layout_columnWeight="3" />
+
+    </android.support.v7.widget.GridLayout>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:text="@string/save"
+        android:minHeight="@dimen/row_min_height"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>

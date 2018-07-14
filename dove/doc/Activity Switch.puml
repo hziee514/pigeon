@@ -1,0 +1,37 @@
+@startuml Dove Activity Switch
+
+title Dove Activity Switch
+
+[*] --> WelcomeActivity : launch by Other App
+
+note left of WelcomeActivity : transitory
+
+WelcomeActivity --> MainActivity : auto
+
+state MainActivity {
+
+[*] --> CageFragment : default
+
+CageFragment --> FeedFragment : slide
+FeedFragment --> CageFragment : slide
+
+FeedFragment --> WorkFragment : slide
+WorkFragment --> FeedFragment : slide
+
+CageFragment -left-> CageInfoActivity
+FeedFragment -left-> EggInfoActivity
+
+}
+
+MainActivity --> AddCageActivity
+MainActivity --> AddEggActivity
+
+state CageInfoActivity {
+    
+}
+
+state EggInfoActivity {
+
+}
+
+@enduml

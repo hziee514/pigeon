@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">鸽子</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="about">关于</string>
+    <string name="backup">备份</string>
+    <string name="restore">恢复</string>
+    <string name="settings">设置</string>
+    <string name="tab_cage">笼位</string>
+    <string name="tab_egg">鸽蛋</string>
+    <string name="tab_task">任务</string>
+    <string name="add">添加</string>
+    <string name="reset">重置</string>
+    <string name="filter">筛选</string>
+    <string name="grouping">分组</string>
+    <string name="lbl_room">房间*</string>
+    <string name="lbl_group">分组*</string>
+    <string name="lbl_layer">分层*</string>
+    <string name="lbl_first">起始*</string>
+    <string name="lbl_last">结束*</string>
+    <string name="lbl_status">状态*</string>
+    <string name="save">保存</string>
+    <string name="first_cant_gt_last">起始序号不能大于结束序号</string>
+</resources>

@@ -1,0 +1,40 @@
+@startuml Domain Model
+
+title Domain Model
+
+class Cage {
+    int id
+    String serialNumber
+    String status
+    Date createdAt
+}
+
+class CageStatus {
+    +String Idle
+    +String Healthly
+    +String Sick
+}
+
+class Egg {
+    int id
+    int cageId
+    int count
+    Date layingAt
+    Date reviewAt
+    Date hatchAt
+    Date maturedAt
+    Date endedAt
+    String status
+    String stage
+}
+
+class Task {
+    int id
+    int cageId
+    int eggId
+    String type
+    Date createAt
+    Date finishAt
+}
+
+@enduml

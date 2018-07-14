@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_menu_settings"
+        android:title="@string/settings" />
+    <item
+        android:id="@+id/nav_backup"
+        android:icon="@drawable/ic_menu_save"
+        android:title="@string/backup" />
+    <item
+        android:id="@+id/nav_restore"
+        android:icon="@drawable/ic_menu_restore"
+        android:title="@string/restore" />
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/ic_menu_about"
+        android:title="@string/about" />
+</menu>
