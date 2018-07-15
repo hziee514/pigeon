@@ -43,8 +43,6 @@ public class MainActivity extends BaseActivity<MainDelegate>
                 break;
             case R.id.nav_restore:
                 break;
-            case R.id.nav_about:
-                break;
         }
         getViewDelegate().closeDrawer();
         return true;

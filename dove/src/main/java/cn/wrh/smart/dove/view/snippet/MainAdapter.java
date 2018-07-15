@@ -18,7 +18,7 @@ import cn.wrh.smart.dove.domain.bo.GroupBO;
  * @author bruce.wu
  * @date 2018/7/14
  */
-public class MainAdapter extends RecyclerView.Adapter implements OnItemClickListener {
+public class MainAdapter extends RecyclerView.Adapter {
 
     public interface ItemViewHolderFactory {
 
@@ -38,6 +38,8 @@ public class MainAdapter extends RecyclerView.Adapter implements OnItemClickList
 
     private ItemViewHolderFactory factory;
 
+    private OnItemClickListener listener;
+
     public MainAdapter(Context context, List<Object> data) {
         this.context = context;
         this.data = data;
@@ -45,6 +47,11 @@ public class MainAdapter extends RecyclerView.Adapter implements OnItemClickList
 
     public MainAdapter setFactory(ItemViewHolderFactory factory) {
         this.factory = factory;
+        return this;
+    }
+
+    public MainAdapter setListener(OnItemClickListener listener) {
+        this.listener = listener;
         return this;
     }
 
@@ -66,7 +73,7 @@ public class MainAdapter extends RecyclerView.Adapter implements OnItemClickList
         if (viewType == TYPE_GROUP) {
             ((GroupViewHolder)holder).bind(data.get(position));
         } else {
-            ((ItemViewHolder)holder).bind(data.get(position), this);
+            ((ItemViewHolder)holder).bind(data.get(position), listener);
         }
     }
 
@@ -79,11 +86,6 @@ public class MainAdapter extends RecyclerView.Adapter implements OnItemClickList
     @Override
     public int getItemCount() {
         return data.size();
-    }
-
-    @Override
-    public void onItemClick(Object item) {
-
     }
 
 }

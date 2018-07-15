@@ -25,12 +25,14 @@ import cn.wrh.smart.dove.domain.bo.GroupBO;
 import cn.wrh.smart.dove.domain.event.BatchCageAddedEvent;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.view.CageListDelegate;
+import cn.wrh.smart.dove.view.snippet.MainAdapter;
+import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
 
 /**
  * @author bruce.wu
  * @date 2018/7/12
  */
-public class CageListFragment extends BaseFragment<CageListDelegate> {
+public class CageListFragment extends BaseFragment<CageListDelegate> implements OnItemClickListener {
 
     public static CageListFragment newInstance() {
         return new CageListFragment();
@@ -42,6 +44,10 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
     private static final String STATE_FILTER = "filter";
 
     private int currentFilter = FILTER_ALL;
+
+    private final List<Object> data = new ArrayList<>();
+
+    private MainAdapter adapter;
 
     public CageListFragment() {
         // Required empty public constructor
@@ -74,7 +80,6 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
     }
 
     private void onFilterSelected(DialogInterface dialog, int which) {
-        dialog.dismiss();
         if (currentFilter == which) {
             return;
         }
@@ -84,6 +89,8 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
 
     @Override
     protected void onLoaded(@Nullable Bundle state) {
+        adapter = getViewDelegate().newAdapter(data, this);
+
         if (state != null) {
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
         }
@@ -107,24 +114,30 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
     private void reload() {
         Log.i(TAG, "current filter: " + currentFilter);
         if (currentFilter == FILTER_ALL) {
-            loadCages(null);
+            AppExecutors.getInstance().diskIO(this::loadAll);
         } else {
             CageModel.Status status = CageModel.Status.values()[currentFilter];
-            loadCages(status);
+            AppExecutors.getInstance().diskIO(() -> loadAll(status));
         }
     }
 
-    private void loadCages(CageModel.Status status) {
-        final AppExecutors executors = AppExecutors.getInstance();
-        executors.diskIO(() -> {
-            List<CageEntity> cages;
-            if (status == null) {
-                cages = getDatabase().cageDao().all();
-            } else {
-                cages = getDatabase().cageDao().loadByStatus(status);
-            }
-            executors.mainThread(() -> getViewDelegate().setData(grouping(cages)));
-        });
+    private void loadAll() {
+        List<CageEntity> entities = getDatabase().cageDao().all();
+        List<Object> grouped = grouping(entities);
+        AppExecutors.getInstance().mainThread(() -> updateAll(grouped));
+    }
+
+    private void loadAll(CageModel.Status status) {
+        List<CageEntity> entities = getDatabase().cageDao().loadByStatus(status);
+        List<Object> grouped = grouping(entities);
+        AppExecutors.getInstance().mainThread(() -> updateAll(grouped));
+    }
+
+    private void updateAll(List<Object> grouped) {
+        Log.d(TAG, "updateAll: " + grouped.size());
+        data.clear();
+        data.addAll(grouped);
+        adapter.notifyDataSetChanged();
     }
 
     private List<Object> grouping(List<CageEntity> entities) {
@@ -142,4 +155,8 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
         return result;
     }
 
+    @Override
+    public void onItemClick(Object item) {
+
+    }
 }

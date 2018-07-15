@@ -6,9 +6,9 @@ import android.util.Log;
 import android.view.View;
 
 import org.greenrobot.eventbus.EventBus;
+import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
-import java.util.Date;
 
 import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
@@ -53,15 +53,15 @@ public class AddCageActivity extends BaseActivity<AddCageDelegate> {
         final CageDao dao = database.cageDao();
         final DecimalFormat df = new DecimalFormat("00");
         database.runInTransaction(() -> {
-            Date now = DateUtils.now();
+            DateTime now = DateUtils.now();
             for (int i = first; i <= last; i++) {
                 CageEntity entity = new CageEntity();
                 String sn = roomId + "-" + groupId + "-" + layerId + df.format(i);
                 entity.setSerialNumber(sn);
                 entity.setStatus(status);
-                entity.setCreatedAt(now);
+                entity.setCreatedAt(now.toDate());
                 dao.insert(entity);
-                Log.d(TAG, "insert cage: " + sn);
+                Log.v(TAG, "insert cage: " + sn);
             }
             EventBus.getDefault().post(new BatchCageAddedEvent(last - first + 1));
         });

@@ -10,6 +10,7 @@ import android.support.annotation.VisibleForTesting;
 import cn.wrh.smart.dove.dal.converter.CageStatusConverter;
 import cn.wrh.smart.dove.dal.converter.DateConverter;
 import cn.wrh.smart.dove.dal.converter.EggStageConverter;
+import cn.wrh.smart.dove.dal.converter.TaskStatusConverter;
 import cn.wrh.smart.dove.dal.converter.TaskTypeConverter;
 import cn.wrh.smart.dove.dal.dao.CageDao;
 import cn.wrh.smart.dove.dal.dao.EggDao;
@@ -32,7 +33,8 @@ import cn.wrh.smart.dove.dal.entity.TaskEntity;
         DateConverter.class,
         CageStatusConverter.class,
         EggStageConverter.class,
-        TaskTypeConverter.class
+        TaskTypeConverter.class,
+        TaskStatusConverter.class
 })
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -55,6 +57,10 @@ public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase build(final Context appContext) {
         return Room.databaseBuilder(appContext, AppDatabase.class, DATABASE_NAME)
                 .build();
+    }
+
+    public void exec(String sql, Object...args) {
+        mDatabase.execSQL(sql, args);
     }
 
     public abstract CageDao cageDao();

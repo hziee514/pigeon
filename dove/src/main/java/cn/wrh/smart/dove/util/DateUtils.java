@@ -1,8 +1,7 @@
 package cn.wrh.smart.dove.util;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  * @author bruce.wu
@@ -10,9 +9,8 @@ import java.util.TimeZone;
  */
 public class DateUtils {
 
-    public static Date now() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        return calendar.getTime();
+    public static DateTime now() {
+        return DateTime.now(DateTimeZone.UTC);
     }
 
 }

@@ -20,23 +20,39 @@ public interface TaskModel {
 
     Date getFinishedAt();
 
+    Status getStatus();
+
+    enum Status {
+
+        /**
+         * 等待执行
+         */
+        Waiting,
+
+        /**
+         * 已完成
+         */
+        Finished,
+
+    }
+
     enum Type {
 
         /**
          * 没下蛋的要检查下蛋
          * 孵化后第14天后要检查下蛋
          */
-        First,
+        Lay1,
 
         /**
          * 下第一个蛋后2天内（明天，后天）下第二个蛋
          */
-        Second,
+        Lay2,
 
         /**
          * 下第二个蛋后第4天检查蛋的好坏
          */
-        Bad,
+        Review,
 
         /**
          * 下第二个蛋后第17天检查孵化了没有

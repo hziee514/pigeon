@@ -43,7 +43,7 @@ public class AddCageDelegate extends AbstractViewDelegate {
 
         getSpinner(R.id.status).setAdapter(new ArrayAdapter<>(getActivity(),
                 R.layout.spinner_dropdown_item,
-                getResources().getStringArray(R.array.status)));
+                getResources().getStringArray(R.array.cage_status)));
         getSpinner(R.id.status).setSelection(CageModel.Status.Healthy.ordinal());
     }
 

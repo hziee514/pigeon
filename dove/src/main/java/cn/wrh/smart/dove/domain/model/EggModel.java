@@ -55,12 +55,12 @@ public interface EggModel {
         /**
          * 下了第一颗蛋
          */
-        First,
+        Laid1,
 
         /**
          * 下了第二颗蛋
          */
-        Second,
+        Laid2,
 
         /**
          * 已巡检

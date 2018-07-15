@@ -33,6 +33,8 @@ public class TaskEntity implements TaskModel {
     @ColumnInfo(name = "FINISHED_AT")
     private Date finishedAt;
 
+    private Status status;
+
     @Override
     public int getId() {
         return this.id;
@@ -63,6 +65,11 @@ public class TaskEntity implements TaskModel {
         return this.finishedAt;
     }
 
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -87,23 +94,28 @@ public class TaskEntity implements TaskModel {
         this.finishedAt = finishedAt;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Ignore
     public TaskEntity() {
 
     }
 
-    public TaskEntity(int id, int cageId, int eggId, Type type, Date createdAt, Date finishedAt) {
+    public TaskEntity(int id, int cageId, int eggId, Type type, Date createdAt, Date finishedAt, Status status) {
         this.id = id;
         this.cageId = cageId;
         this.eggId = eggId;
         this.type = type;
         this.createdAt = createdAt;
         this.finishedAt = finishedAt;
+        this.status = status;
     }
 
     public TaskEntity(TaskModel model) {
         this(model.getId(), model.getCageId(), model.getEggId(),
-                model.getType(), model.getCreatedAt(), model.getFinishedAt());
+                model.getType(), model.getCreatedAt(), model.getFinishedAt(), model.getStatus());
     }
 
 }

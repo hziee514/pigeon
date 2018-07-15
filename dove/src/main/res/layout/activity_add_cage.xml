@@ -69,7 +69,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"/>
         <Spinner
             android:id="@+id/status"
-            tools:entries="@array/status"
+            tools:entries="@array/cage_status"
             app:layout_columnWeight="3" />
 
     </android.support.v7.widget.GridLayout>

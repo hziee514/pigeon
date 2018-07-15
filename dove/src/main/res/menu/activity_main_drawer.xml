@@ -14,8 +14,4 @@
         android:id="@+id/nav_restore"
         android:icon="@drawable/ic_menu_restore"
         android:title="@string/restore" />
-    <item
-        android:id="@+id/nav_about"
-        android:icon="@drawable/ic_menu_about"
-        android:title="@string/about" />
 </menu>
