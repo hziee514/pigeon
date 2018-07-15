@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import cn.wrh.smart.dove.R;
@@ -38,7 +36,9 @@ public class MainAdapter extends RecyclerView.Adapter {
 
     private ItemViewHolderFactory factory;
 
-    private OnItemClickListener listener;
+    private OnItemClickListener clickListener;
+
+    private OnItemLongClickListener longClickListener;
 
     public MainAdapter(Context context, List<Object> data) {
         this.context = context;
@@ -50,8 +50,13 @@ public class MainAdapter extends RecyclerView.Adapter {
         return this;
     }
 
-    public MainAdapter setListener(OnItemClickListener listener) {
-        this.listener = listener;
+    public MainAdapter setItemClickListener(OnItemClickListener listener) {
+        this.clickListener = listener;
+        return this;
+    }
+
+    public MainAdapter setItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
         return this;
     }
 
@@ -73,7 +78,7 @@ public class MainAdapter extends RecyclerView.Adapter {
         if (viewType == TYPE_GROUP) {
             ((GroupViewHolder)holder).bind(data.get(position));
         } else {
-            ((ItemViewHolder)holder).bind(data.get(position), listener);
+            ((ItemViewHolder)holder).bind(position, data.get(position), clickListener, longClickListener);
         }
     }
 

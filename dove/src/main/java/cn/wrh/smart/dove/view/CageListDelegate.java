@@ -48,7 +48,7 @@ public class CageListDelegate extends AbstractViewDelegate {
     public MainAdapter newAdapter(final List<Object> data, final OnItemClickListener listener) {
         MainAdapter adapter = new MainAdapter(getActivity(), data)
                 .setFactory(new CageViewHolderFactory())
-                .setListener(listener);
+                .setItemClickListener(listener);
         list.setAdapter(adapter);
         return adapter;
     }

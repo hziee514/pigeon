@@ -33,8 +33,8 @@ public class EggEntity implements EggModel {
     @ColumnInfo(name = "HATCH_AT")
     private Date hatchAt;
 
-    @ColumnInfo(name = "ENDED_AT")
-    private Date endedAt;
+    @ColumnInfo(name = "SOLD_AT")
+    private Date soldAt;
 
     private Stage stage;
 
@@ -69,8 +69,8 @@ public class EggEntity implements EggModel {
     }
 
     @Override
-    public Date getEndedAt() {
-        return this.endedAt;
+    public Date getSoldAt() {
+        return this.soldAt;
     }
 
     @Override
@@ -102,8 +102,8 @@ public class EggEntity implements EggModel {
         this.hatchAt = hatchAt;
     }
 
-    public void setEndedAt(Date endedAt) {
-        this.endedAt = endedAt;
+    public void setSoldAt(Date soldAt) {
+        this.soldAt = soldAt;
     }
 
     public void setStage(Stage stage) {
@@ -116,14 +116,14 @@ public class EggEntity implements EggModel {
     }
 
     public EggEntity(int id, int cageId, int count,
-                     Date layingAt, Date reviewAt, Date hatchAt, Date endedAt, Stage stage) {
+                     Date layingAt, Date reviewAt, Date hatchAt, Date soldAt, Stage stage) {
         this.id = id;
         this.cageId = cageId;
         this.count = count;
         this.layingAt = layingAt;
         this.reviewAt = reviewAt;
         this.hatchAt = hatchAt;
-        this.endedAt = endedAt;
+        this.soldAt = soldAt;
         this.stage = stage;
     }
 
@@ -134,7 +134,7 @@ public class EggEntity implements EggModel {
         this.layingAt = model.getLayingAt();
         this.reviewAt = model.getReviewAt();
         this.hatchAt = model.getHatchAt();
-        this.endedAt = model.getEndedAt();
+        this.soldAt = model.getSoldAt();
         this.stage = model.getStage();
     }
 

@@ -8,7 +8,6 @@ import android.widget.TextView;
 import com.google.common.base.Preconditions;
 
 import cn.wrh.smart.dove.R;
-import cn.wrh.smart.dove.domain.model.TaskModel;
 
 /**
  * @author bruce.wu
@@ -22,19 +21,29 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
 
     protected final TextView text2;
 
+    protected final ImageView image2;
+
     protected ItemViewHolder(View itemView) {
         super(itemView);
         image1 = itemView.findViewById(R.id.image1);
         text1 = itemView.findViewById(R.id.text1);
         text2 = itemView.findViewById(R.id.text2);
+        image2 = itemView.findViewById(R.id.image2);
     }
 
-    public void bind(Object o, OnItemClickListener listener) {
+    public void bind(int position, Object o, OnItemClickListener listener, OnItemLongClickListener longClickListener) {
         bind(o);
         itemView.setOnClickListener(view -> {
             if (listener != null) {
-                listener.onItemClick(o);
+                listener.onItemClick(position, o);
             }
+        });
+        itemView.setOnLongClickListener(view -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(position, o);
+                return true;
+            }
+            return false;
         });
     }
 

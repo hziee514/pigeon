@@ -6,6 +6,6 @@ package cn.wrh.smart.dove.view.snippet;
  */
 public interface OnItemClickListener {
 
-    void onItemClick(Object item);
+    void onItemClick(int position, Object item);
 
 }

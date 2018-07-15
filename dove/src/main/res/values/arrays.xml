@@ -74,4 +74,8 @@
         <item>检查孵化</item>
         <item>检查出栏</item>
     </string-array>
+    <string-array name="task_actions">
+        <item>已经确认</item>
+        <item>明天再看</item>
+    </string-array>
 </resources>

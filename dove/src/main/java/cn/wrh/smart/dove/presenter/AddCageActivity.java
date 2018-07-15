@@ -63,8 +63,8 @@ public class AddCageActivity extends BaseActivity<AddCageDelegate> {
                 dao.insert(entity);
                 Log.v(TAG, "insert cage: " + sn);
             }
-            EventBus.getDefault().post(new BatchCageAddedEvent(last - first + 1));
         });
+        EventBus.getDefault().post(new BatchCageAddedEvent(last - first + 1));
         finish();
     }
 

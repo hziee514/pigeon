@@ -1,8 +1,12 @@
 package cn.wrh.smart.dove.dal.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.util.Log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author bruce.wu
@@ -10,14 +14,21 @@ import java.util.Date;
  */
 public class DateConverter {
 
+    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     @TypeConverter
-    public static Date toDate(Long timestamp) {
-        return timestamp == null ? null : new Date(timestamp);
+    public static Date toDate(String timestamp) {
+        try {
+            return timestamp == null ? null : new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).parse(timestamp);
+        } catch (ParseException e) {
+            Log.e("DateConverter", timestamp, e);
+            return null;
+        }
     }
 
     @TypeConverter
-    public static Long toTimestamp(Date date) {
-        return date == null ? null : date.getTime();
+    public static String toTimestamp(Date date) {
+        return date == null ? null : new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).format(date);
     }
 
 }

@@ -38,7 +38,7 @@ public interface EggModel {
     /**
      * @return 出栏时间
      */
-    Date getEndedAt();
+    Date getSoldAt();
 
     /**
      * @return 阶段

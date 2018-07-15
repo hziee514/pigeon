@@ -156,7 +156,7 @@ public class CageListFragment extends BaseFragment<CageListDelegate> implements 
     }
 
     @Override
-    public void onItemClick(Object item) {
+    public void onItemClick(int position, Object item) {
 
     }
 }

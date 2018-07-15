@@ -33,4 +33,11 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <ImageView
+        android:id="@+id/image2"
+        android:src="@drawable/ic_disclosure"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

@@ -18,6 +18,7 @@ import cn.wrh.smart.dove.view.snippet.DividerDecoration;
 import cn.wrh.smart.dove.view.snippet.ItemViewHolder;
 import cn.wrh.smart.dove.view.snippet.MainAdapter;
 import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
+import cn.wrh.smart.dove.view.snippet.OnItemLongClickListener;
 
 /**
  * @author bruce.wu
@@ -44,10 +45,13 @@ public class TaskListDelegate extends AbstractViewDelegate {
         list.addItemDecoration(new DividerDecoration(getResources()));
     }
 
-    public MainAdapter newAdapter(final List<Object> data, final OnItemClickListener listener) {
+    public MainAdapter newAdapter(final List<Object> data,
+                                  final OnItemClickListener listener,
+                                  final OnItemLongClickListener longClickListener) {
         MainAdapter adapter = new MainAdapter(getActivity(), data)
                 .setFactory(new TaskViewHolderFactory())
-                .setListener(listener);
+                .setItemClickListener(listener)
+                .setItemLongClickListener(longClickListener);
         list.setAdapter(adapter);
         return adapter;
     }
@@ -65,7 +69,19 @@ public class TaskListDelegate extends AbstractViewDelegate {
 
     public void showFilterDialog(int selected, final DialogInterface.OnClickListener clickListener) {
         new AlertDialog.Builder(getActivity())
-                .setSingleChoiceItems(R.array.task_filters, selected, clickListener)
+                .setSingleChoiceItems(R.array.task_filters, selected, (dialog, which) -> {
+                    dialog.dismiss();
+                    clickListener.onClick(dialog, which);
+                })
+                .show();
+    }
+
+    public void showActionDialog(DialogInterface.OnClickListener listener) {
+        new AlertDialog.Builder(getActivity())
+                .setItems(R.array.task_actions, (dialog, which) -> {
+                    dialog.dismiss();
+                    listener.onClick(dialog, which);
+                })
                 .show();
     }
 
@@ -85,6 +101,7 @@ public class TaskListDelegate extends AbstractViewDelegate {
             setName(bo.getCageSn());
             setType(bo.getType());
             setStatus(bo.getStatus());
+            setDisclosure(bo.getEggId());
         }
 
         private void setType(TaskModel.Type type) {
@@ -98,6 +115,10 @@ public class TaskListDelegate extends AbstractViewDelegate {
             } else {
                 image1.setImageResource(R.drawable.ic_task_finished);
             }
+        }
+
+        private void setDisclosure(int eggId) {
+            image2.setVisibility(eggId > 0 ? View.VISIBLE : View.GONE);
         }
 
     }

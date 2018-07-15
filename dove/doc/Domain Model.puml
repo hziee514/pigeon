@@ -23,7 +23,7 @@ class Egg {
     Date reviewAt
     Date hatchAt
     Date maturedAt
-    Date endedAt
+    Date soldAt
     String status
     String stage
 }

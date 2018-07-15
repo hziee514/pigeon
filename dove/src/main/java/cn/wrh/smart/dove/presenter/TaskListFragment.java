@@ -5,29 +5,37 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
+import cn.wrh.smart.dove.dal.dao.TaskDao;
+import cn.wrh.smart.dove.dal.entity.TaskEntity;
 import cn.wrh.smart.dove.domain.bo.GroupBO;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
+import cn.wrh.smart.dove.util.DateUtils;
+import cn.wrh.smart.dove.util.EggLifecycle;
 import cn.wrh.smart.dove.util.TaskBuilder;
 import cn.wrh.smart.dove.view.TaskListDelegate;
 import cn.wrh.smart.dove.view.snippet.MainAdapter;
 import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
+import cn.wrh.smart.dove.view.snippet.OnItemLongClickListener;
 
 /**
  * @author bruce.wu
  * @date 2018/7/14
  */
-public class TaskListFragment extends BaseFragment<TaskListDelegate> implements OnItemClickListener {
+public class TaskListFragment extends BaseFragment<TaskListDelegate>
+        implements OnItemClickListener, OnItemLongClickListener {
 
     public static TaskListFragment newInstance() {
         return new TaskListFragment();
@@ -97,7 +105,7 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate> implements 
 
     @Override
     protected void onLoaded(@Nullable Bundle state) {
-        adapter = getViewDelegate().newAdapter(data, this);
+        adapter = getViewDelegate().newAdapter(data, this, this);
         reload();
     }
 
@@ -112,13 +120,13 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate> implements 
     }
 
     private void loadAllTasks() {
-        List<TaskBO> tasks = getDatabase().taskDao().all();
+        List<TaskBO> tasks = getDatabase().taskDao().today();
         List<Object> grouped = grouping(tasks);
         AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
     }
 
     private void loadTasks(TaskModel.Status status) {
-        List<TaskBO> tasks = getDatabase().taskDao().loadByStatus(status);
+        List<TaskBO> tasks = getDatabase().taskDao().todayWithStatus(status);
         List<Object> grouped = grouping(tasks);
         AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
     }
@@ -145,7 +153,67 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate> implements 
     }
 
     @Override
-    public void onItemClick(Object item) {
-
+    public void onItemClick(int position, Object item) {
+        Toast.makeText(getContext(), "onItemClick", Toast.LENGTH_SHORT).show();
+        //TODO show egg details
     }
+
+    @Override
+    public void onItemLongClick(int position, Object item) {
+        getViewDelegate().showActionDialog((dialog, which) -> onTaskAction(position, which));
+    }
+
+    private void onTaskAction(final int position, int which) {
+        switch (which) {
+            case 0: //已经确认
+                AppExecutors.getInstance().diskIO(() -> confirmTask(position));
+                break;
+            case 1: //明天在看
+                AppExecutors.getInstance().diskIO(() -> finishTask(position));
+                break;
+        }
+    }
+
+    private void finishTask(int position) {
+        TaskBO bo = (TaskBO)data.get(position);
+        Date now = DateUtils.now().toDate();
+        bo.setFinishedAt(now);
+        bo.setStatus(TaskModel.Status.Finished);
+
+        TaskDao dao = getDatabase().taskDao();
+        TaskEntity entity = dao.fetch(bo.getId());
+        entity.setFinishedAt(now);
+        entity.setStatus(TaskModel.Status.Finished);
+        dao.update(entity);
+
+        updateItem(position);
+    }
+
+    private void confirmTask(int position) {
+        TaskBO bo = (TaskBO)data.get(position);
+        EggLifecycle lifecycle = EggLifecycle.create(getDatabase());
+        switch (bo.getType()) {
+            case Lay1:
+                lifecycle.toLaid1(bo);
+                break;
+            case Lay2:
+                lifecycle.toLaid2(bo);
+                break;
+            case Review:
+                lifecycle.toReviewed(bo);
+                break;
+            case Hatch:
+                lifecycle.toHatched(bo);
+                break;
+            case Sell:
+                lifecycle.toSold(bo);
+                break;
+        }
+        finishTask(position);
+    }
+
+    private void updateItem(final int position) {
+        AppExecutors.getInstance().mainThread(() -> adapter.notifyItemChanged(position));
+    }
+
 }

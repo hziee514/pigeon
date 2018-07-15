@@ -29,19 +29,22 @@ public interface TaskDao {
     @Delete
     void delete(TaskEntity...entities);
 
+    @Query("SELECT * FROM TASK WHERE ID = :id")
+    TaskEntity fetch(int id);
+
     @Query("DELETE FROM TASK")
     void clear();
 
-    @Query("SELECT DISTINCT a.id, a.CAGE_ID as cageId, b.SERIAL_NUMBER as cageSn, a.EGG_ID as eggId, a.TYPE, a.FINISHED_AT as finishedAt, a.STATUS " +
+    @Query("SELECT DISTINCT a.id, a.CAGE_ID, b.SERIAL_NUMBER as CAGE_SN, a.EGG_ID, a.TYPE, a.CREATED_AT, a.FINISHED_AT, a.STATUS " +
             "FROM TASK a, CAGE b " +
             "WHERE a.CAGE_ID = b.ID and date(a.CREATED_AT) = date('now','localtime') " +
-            "order by cageSn, type, finishedAt ")
-    List<TaskBO> all();
+            "order by CAGE_SN, type, FINISHED_AT ")
+    List<TaskBO> today();
 
-    @Query("SELECT DISTINCT a.id, a.CAGE_ID as cageId, b.SERIAL_NUMBER as cageSn, a.EGG_ID as eggId, a.TYPE, a.FINISHED_AT as finishedAt, a.STATUS " +
+    @Query("SELECT DISTINCT a.id, a.CAGE_ID, b.SERIAL_NUMBER as CAGE_SN, a.EGG_ID, a.TYPE, a.CREATED_AT, a.FINISHED_AT, a.STATUS " +
             "FROM TASK a, CAGE b " +
             "WHERE a.CAGE_ID = b.ID and a.STATUS = :status and date(a.CREATED_AT) = date('now','localtime') " +
-            "order by cageSn, type, finishedAt ")
-    List<TaskBO> loadByStatus(TaskModel.Status status);
+            "order by CAGE_SN, type, FINISHED_AT ")
+    List<TaskBO> todayWithStatus(TaskModel.Status status);
 
 }
