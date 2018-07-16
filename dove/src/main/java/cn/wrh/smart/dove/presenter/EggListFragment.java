@@ -1,5 +1,6 @@
 package cn.wrh.smart.dove.presenter;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
@@ -52,6 +53,9 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
             case R.id.action_grouping:
                 onGrouping();
                 return true;
+            case R.id.action_refresh:
+                reload();
+                return true;
         }
         return false;
     }
@@ -61,7 +65,15 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
     }
 
     private void onGrouping() {
+        getViewDelegate().showGroupDialog(groupMethod, this::onGroupSelected);
+    }
 
+    private void onGroupSelected(DialogInterface dialogInterface, int which) {
+        if (groupMethod == which) {
+            return;
+        }
+        groupMethod = which;
+        reload();
     }
 
     @Override

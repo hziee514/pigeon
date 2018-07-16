@@ -58,7 +58,7 @@ public class TaskBuilder {
      */
     public void buildSecond() {
         String sql = "INSERT INTO TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
-                "SELECT DISTINCT a.ID AS CAGE_ID, 0 AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
+                "SELECT DISTINCT a.ID AS CAGE_ID, b.ID AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
                 "FROM CAGE a, EGG b " +
                 "WHERE a.STATUS != ? " +
                 "AND b.COUNT = 1 AND a.id = b.CAGE_ID " +
@@ -73,7 +73,7 @@ public class TaskBuilder {
      */
     public void buildReview() {
         String sql = "INSERT INTO TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
-                "SELECT DISTINCT a.ID AS CAGE_ID, 0 AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
+                "SELECT DISTINCT a.ID AS CAGE_ID, b.ID AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
                 "FROM CAGE a, EGG b " +
                 "WHERE a.STATUS != ? " +
                 "AND b.COUNT = 2 AND a.id = b.CAGE_ID " +
@@ -88,7 +88,7 @@ public class TaskBuilder {
      */
     public void buildHatch() {
         String sql = "INSERT INTO TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
-                "SELECT DISTINCT a.ID AS CAGE_ID, 0 AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
+                "SELECT DISTINCT a.ID AS CAGE_ID, b.ID AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
                 "FROM CAGE a, EGG b " +
                 "WHERE a.STATUS != ? " +
                 "AND b.COUNT = 2 AND a.id = b.CAGE_ID " +
@@ -102,7 +102,7 @@ public class TaskBuilder {
      */
     public void buildSell() {
         String sql = "INSERT INTO TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
-                "SELECT DISTINCT a.ID AS CAGE_ID, 0 AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
+                "SELECT DISTINCT a.ID AS CAGE_ID, b.ID AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
                 "FROM CAGE a, EGG b " +
                 "WHERE a.STATUS != ? " +
                 "AND b.COUNT = 2 AND a.id = b.CAGE_ID " +

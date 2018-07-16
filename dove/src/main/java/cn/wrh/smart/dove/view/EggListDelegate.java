@@ -1,29 +1,21 @@
 package cn.wrh.smart.dove.view;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.vo.EggVO;
-import cn.wrh.smart.dove.mvp.AbstractViewDelegate;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
 /**
  * @author bruce.wu
  * @date 2018/7/14
  */
-public class EggListDelegate extends AbstractViewDelegate {
-
-    private ExpandableListView list;
-    private EggExpandableListAdapter adapter;
-
-    @Override
-    public int getRootLayoutId() {
-        return R.layout.fragment_expandable_listview;
-    }
+public class EggListDelegate extends AbstractListDelegate {
 
     @Override
     public int getOptionsMenuId() {
@@ -31,17 +23,17 @@ public class EggListDelegate extends AbstractViewDelegate {
     }
 
     @Override
-    public void onInit() {
-        list = findViewById(R.id.list);
+    protected MyExpandableListAdapter createAdapter(List<String> groups, List<List<Object>> data) {
+        return new EggExpandableListAdapter(groups, data);
     }
 
-    public void setupList(final List<String> groups, List<List<Object>> data) {
-        adapter = new EggExpandableListAdapter(groups, data);
-        list.setAdapter(adapter);
-    }
-
-    public void updateList() {
-        adapter.notifyDataSetInvalidated();
+    public void showGroupDialog(int selected, final DialogInterface.OnClickListener clickListener) {
+        new AlertDialog.Builder(getActivity())
+                .setSingleChoiceItems(R.array.egg_groups, selected, (dialog, which) -> {
+                    dialog.dismiss();
+                    clickListener.onClick(dialog, which);
+                })
+                .show();
     }
 
     class EggExpandableListAdapter extends MyExpandableListAdapter {

@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -12,22 +11,13 @@ import java.util.List;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.domain.model.CageModel;
-import cn.wrh.smart.dove.mvp.AbstractViewDelegate;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
 /**
  * @author bruce.wu
  * @date 2018/7/12
  */
-public class CageListDelegate extends AbstractViewDelegate {
-
-    private ExpandableListView list;
-    private CageExpandableListAdapter adapter;
-
-    @Override
-    public int getRootLayoutId() {
-        return R.layout.fragment_expandable_listview;
-    }
+public class CageListDelegate extends AbstractListDelegate {
 
     @Override
     public int getOptionsMenuId() {
@@ -35,17 +25,8 @@ public class CageListDelegate extends AbstractViewDelegate {
     }
 
     @Override
-    public void onInit() {
-        list = findViewById(R.id.list);
-    }
-
-    public void setupList(final List<String> groups, List<List<Object>> data) {
-        adapter = new CageExpandableListAdapter(groups, data);
-        list.setAdapter(adapter);
-    }
-
-    public void updateList() {
-        adapter.notifyDataSetInvalidated();
+    protected MyExpandableListAdapter createAdapter(List<String> groups, List<List<Object>> data) {
+        return new CageExpandableListAdapter(groups, data);
     }
 
     public void showFilterDialog(int selected, DialogInterface.OnClickListener clickListener) {

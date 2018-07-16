@@ -66,6 +66,9 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
             case R.id.action_filter:
                 onFilter();
                 return true;
+            case R.id.action_refresh:
+                reload();
+                return true;
         }
         return false;
     }

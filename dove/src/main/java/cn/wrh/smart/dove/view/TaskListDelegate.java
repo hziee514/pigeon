@@ -3,7 +3,6 @@ package cn.wrh.smart.dove.view;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,45 +13,28 @@ import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
-import cn.wrh.smart.dove.mvp.AbstractViewDelegate;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
 /**
  * @author bruce.wu
  * @date 2018/7/14
  */
-public class TaskListDelegate extends AbstractViewDelegate {
+public class TaskListDelegate extends AbstractListDelegate {
 
-    private ExpandableListView list;
-    private MyExpandableListAdapter adapter;
     private ActionListener actionListener;
-
-    @Override
-    public int getRootLayoutId() {
-        return R.layout.fragment_expandable_listview;
-    }
 
     @Override
     public int getOptionsMenuId() {
         return R.menu.main_tab_task;
     }
 
-    @Override
-    public void onInit() {
-        list = findViewById(R.id.list);
-    }
-
-    public void setupList(final List<String> groups, List<List<Object>> data) {
-        adapter = new TaskExpandableListAdapter(groups, data);
-        list.setAdapter(adapter);
-    }
-
     public void setActionListener(ActionListener listener) {
         this.actionListener = listener;
     }
 
-    public void updateList() {
-        adapter.notifyDataSetInvalidated();
+    @Override
+    protected MyExpandableListAdapter createAdapter(List<String> groups, List<List<Object>> data) {
+        return new TaskExpandableListAdapter(groups, data);
     }
 
     public void showResetConfirm(final Runnable runnable) {

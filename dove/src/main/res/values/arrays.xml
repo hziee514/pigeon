@@ -85,4 +85,8 @@
         <item>已孵化</item>
         <item>已出栏</item>
     </string-array>
+    <string-array name="egg_groups">
+        <item>分类</item>
+        <item>日期</item>
+    </string-array>
 </resources>

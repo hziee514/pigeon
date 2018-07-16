@@ -68,6 +68,9 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
             case R.id.action_filter:
                 onFilter();
                 return true;
+            case R.id.action_refresh:
+                reload();
+                return true;
         }
         return false;
     }
@@ -98,7 +101,6 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     }
 
     private void onFilterSelected(DialogInterface dialog, int which) {
-        dialog.dismiss();
         if (currentFilter == which) {
             return;
         }
