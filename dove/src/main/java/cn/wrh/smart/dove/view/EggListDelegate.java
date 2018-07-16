@@ -1,8 +1,7 @@
 package cn.wrh.smart.dove.view;
 
-import android.content.Context;
 import android.os.Handler;
-import android.widget.BaseExpandableListAdapter;
+import android.view.View;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 public class EggListDelegate extends AbstractViewDelegate {
 
     private ExpandableListView list;
+    private EggExpandableListAdapter adapter;
 
     @Override
     public int getRootLayoutId() {
@@ -42,8 +42,8 @@ public class EggListDelegate extends AbstractViewDelegate {
                 Arrays.asList("222-1"),
                 Arrays.asList("333-1", "333-2")
         ));
-        BaseExpandableListAdapter adapter = new EggExpandableListAdapter(getActivity(), groups, children);
-        list.setAdapter(adapter);
+
+        setupList(groups, children);
 
         new Handler().postDelayed(() -> {
             groups.add("444");
@@ -52,9 +52,24 @@ public class EggListDelegate extends AbstractViewDelegate {
         }, 2000);
     }
 
-    static class EggExpandableListAdapter extends MyExpandableListAdapter {
-        EggExpandableListAdapter(Context context, List<String> groups, List<List<Object>> children) {
-            super(context, groups, children);
+    public void setupList(final List<String> groups, List<List<Object>> data) {
+        adapter = new EggExpandableListAdapter(groups, data);
+        list.setAdapter(adapter);
+    }
+
+    public void updateList() {
+        adapter.notifyDataSetInvalidated();
+    }
+
+    class EggExpandableListAdapter extends MyExpandableListAdapter {
+
+        EggExpandableListAdapter(List<String> groups, List<List<Object>> children) {
+            super(getActivity(), groups, children);
+        }
+
+        @Override
+        protected void bindChild(View view, int groupPosition, int childPosition) {
+
         }
     }
 

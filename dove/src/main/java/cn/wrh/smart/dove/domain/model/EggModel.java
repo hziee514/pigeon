@@ -48,11 +48,6 @@ public interface EggModel {
     enum Stage {
 
         /**
-         * 初始状态
-         */
-        Prepared,
-
-        /**
          * 下了第一颗蛋
          */
         Laid1,
