@@ -1,14 +1,13 @@
 package cn.wrh.smart.dove.view;
 
-import android.os.Handler;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import cn.wrh.smart.dove.R;
+import cn.wrh.smart.dove.domain.vo.EggVO;
 import cn.wrh.smart.dove.mvp.AbstractViewDelegate;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
@@ -34,22 +33,6 @@ public class EggListDelegate extends AbstractViewDelegate {
     @Override
     public void onInit() {
         list = findViewById(R.id.list);
-
-        List<String> groups = new ArrayList<>(Arrays.asList("111", "222", "333"));
-        Arrays.asList("111", "222", "333");
-        List<List<Object>> children = new ArrayList<>(Arrays.asList(
-                Arrays.asList("111-1", "111-2", "111-3"),
-                Arrays.asList("222-1"),
-                Arrays.asList("333-1", "333-2")
-        ));
-
-        setupList(groups, children);
-
-        new Handler().postDelayed(() -> {
-            groups.add("444");
-            children.add(Arrays.asList("444-1", "444-2"));
-            adapter.notifyDataSetInvalidated();
-        }, 2000);
     }
 
     public void setupList(final List<String> groups, List<List<Object>> data) {
@@ -69,7 +52,21 @@ public class EggListDelegate extends AbstractViewDelegate {
 
         @Override
         protected void bindChild(View view, int groupPosition, int childPosition) {
+            EggVO vo = (EggVO) getChild(groupPosition, childPosition);
+            setName(view, vo.getCageSn());
+            if (vo.getGroupMethod() == EggVO.GROUP_DATE) {
+                setStatus(view, vo.getStageText());
+            } else {
+                setStatus(view, vo.getDate());
+            }
+        }
 
+        private void setName(View view, String name) {
+            ((TextView)view.findViewById(R.id.text1)).setText(name);
+        }
+
+        private void setStatus(View view, String status) {
+            ((TextView)view.findViewById(R.id.text2)).setText(status);
         }
     }
 
