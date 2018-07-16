@@ -2,23 +2,20 @@ package cn.wrh.smart.dove.view;
 
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
-import com.google.common.base.Preconditions;
+import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
+import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.mvp.AbstractViewDelegate;
-import cn.wrh.smart.dove.view.snippet.DividerDecoration;
-import cn.wrh.smart.dove.view.snippet.ItemViewHolder;
-import cn.wrh.smart.dove.view.snippet.MainAdapter;
-import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
-import cn.wrh.smart.dove.view.snippet.OnItemLongClickListener;
+import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
 /**
  * @author bruce.wu
@@ -26,11 +23,13 @@ import cn.wrh.smart.dove.view.snippet.OnItemLongClickListener;
  */
 public class TaskListDelegate extends AbstractViewDelegate {
 
-    private RecyclerView list;
+    private ExpandableListView list;
+    private MyExpandableListAdapter adapter;
+    private ActionListener actionListener;
 
     @Override
     public int getRootLayoutId() {
-        return R.layout.fragment_main_list;
+        return R.layout.fragment_expandable_listview;
     }
 
     @Override
@@ -41,19 +40,19 @@ public class TaskListDelegate extends AbstractViewDelegate {
     @Override
     public void onInit() {
         list = findViewById(R.id.list);
-        list.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        list.addItemDecoration(new DividerDecoration(getResources()));
     }
 
-    public MainAdapter newAdapter(final List<Object> data,
-                                  final OnItemClickListener listener,
-                                  final OnItemLongClickListener longClickListener) {
-        MainAdapter adapter = new MainAdapter(getActivity(), data)
-                .setFactory(new TaskViewHolderFactory())
-                .setItemClickListener(listener)
-                .setItemLongClickListener(longClickListener);
+    public void setupList(final List<String> groups, List<List<Object>> data) {
+        adapter = new TaskExpandableListAdapter(groups, data);
         list.setAdapter(adapter);
-        return adapter;
+    }
+
+    public void setActionListener(ActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void updateList() {
+        adapter.notifyDataSetInvalidated();
     }
 
     public void showResetConfirm(final Runnable runnable) {
@@ -76,58 +75,91 @@ public class TaskListDelegate extends AbstractViewDelegate {
                 .show();
     }
 
-    public void showActionDialog(DialogInterface.OnClickListener listener) {
-        new AlertDialog.Builder(getActivity())
-                .setItems(R.array.task_actions, (dialog, which) -> {
-                    dialog.dismiss();
-                    listener.onClick(dialog, which);
-                })
-                .show();
+    public interface ActionListener {
+
+        void onConfirm(int groupPosition, int childPosition);
+
+        void onFinish(int groupPosition, int childPosition);
+
     }
 
-    static class TaskViewHolder extends ItemViewHolder {
+    class TaskExpandableListAdapter extends MyExpandableListAdapter {
 
-        TaskViewHolder(View itemView) {
-            super(itemView);
-            image1.setVisibility(View.VISIBLE);
+        TaskExpandableListAdapter(List<String> groups, List<List<Object>> children) {
+            super(getActivity(), groups, children);
         }
 
         @Override
-        protected void bind(Object o) {
-            super.bind(o);
-            Preconditions.checkArgument(o instanceof TaskBO,
-                    "Invalid type: " + o.getClass().getSimpleName());
-            final TaskBO bo = (TaskBO)o;
-            setName(bo.getCageSn());
-            setType(bo.getType());
-            setStatus(bo.getStatus());
-            setDisclosure(bo.getEggId());
+        protected void bindChild(View view, int groupPosition, int childPosition) {
+            TaskBO bo = (TaskBO)getChild(groupPosition, childPosition);
+            setName(view, bo.getCageSn());
+            setType(view, bo.getType());
+            setStatus(view, bo.getStatus());
+            setDisclosure(view, bo.getEggId());
         }
 
-        private void setType(TaskModel.Type type) {
-            final String[] TYPES = itemView.getResources().getStringArray(R.array.task_types);
-            text2.setText(TYPES[type.ordinal()]);
+        @Override
+        protected void onItemClick(View view, int groupPosition, int childPosition) {
+            Toast.makeText(getActivity(), "onItemClick", Toast.LENGTH_SHORT).show();
         }
 
-        private void setStatus(TaskModel.Status status) {
-            if (status == TaskModel.Status.Waiting) {
-                image1.setImageResource(R.drawable.ic_task_waiting);
-            } else {
-                image1.setImageResource(R.drawable.ic_task_finished);
+        @Override
+        protected boolean onItemLongClick(View view, int groupPosition, int childPosition) {
+            new AlertDialog.Builder(getActivity())
+                    .setItems(R.array.task_actions, (dialog, which) -> {
+                        dialog.dismiss();
+                        if (actionListener == null) {
+                            return;
+                        }
+                        Runnable runnable = () -> finishTask(view, groupPosition, childPosition);
+                        onAction(which, groupPosition, childPosition, runnable);
+                    })
+                    .show();
+            return true;
+        }
+
+        private void onAction(int which, int groupPosition, int childPosition, Runnable runnable) {
+            AppExecutors executors = AppExecutors.getInstance();
+            switch (which) {
+                case 0: //已经确认
+                    executors.diskIO(() -> {
+                        actionListener.onConfirm(groupPosition, childPosition);
+                        runnable.run();
+                    });
+                case 1: //明天在看
+                    executors.diskIO(() -> {
+                        actionListener.onFinish(groupPosition, childPosition);
+                        runnable.run();
+                    });
+                    break;
             }
         }
 
-        private void setDisclosure(int eggId) {
-            image2.setVisibility(eggId > 0 ? View.VISIBLE : View.GONE);
+        private void finishTask(View view, int groupPosition, int childPosition) {
+            AppExecutors.getInstance().mainThread(() -> bindChild(view, groupPosition, childPosition));
         }
 
-    }
-
-    static class TaskViewHolderFactory implements MainAdapter.ItemViewHolderFactory {
-        @Override
-        public ItemViewHolder create(View view) {
-            return new TaskViewHolder(view);
+        private void setName(View view, String name) {
+            ((TextView)view.findViewById(R.id.text1)).setText(name);
         }
+
+        private void setType(View view, TaskModel.Type type) {
+            String[] types = view.getResources().getStringArray(R.array.task_types);
+            ((TextView)view.findViewById(R.id.text2)).setText(types[type.ordinal()]);
+        }
+
+        private void setStatus(View view, TaskModel.Status status) {
+            ImageView image1 = view.findViewById(R.id.image1);
+            image1.setVisibility(View.VISIBLE);
+            image1.setImageResource(status == TaskModel.Status.Waiting
+                    ? R.drawable.ic_task_waiting : R.drawable.ic_task_finished);
+        }
+
+        private void setDisclosure(View view, int eggId) {
+            ImageView image2 = view.findViewById(R.id.image2);
+            image2.setVisibility(eggId > 0 ? View.VISIBLE : View.INVISIBLE);
+        }
+
     }
 
 }

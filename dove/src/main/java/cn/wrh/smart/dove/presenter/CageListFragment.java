@@ -15,7 +15,9 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
@@ -25,14 +27,12 @@ import cn.wrh.smart.dove.domain.bo.GroupBO;
 import cn.wrh.smart.dove.domain.event.BatchCageAddedEvent;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.view.CageListDelegate;
-import cn.wrh.smart.dove.view.snippet.MainAdapter;
-import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
 
 /**
  * @author bruce.wu
  * @date 2018/7/12
  */
-public class CageListFragment extends BaseFragment<CageListDelegate> implements OnItemClickListener {
+public class CageListFragment extends BaseFragment<CageListDelegate> {
 
     public static CageListFragment newInstance() {
         return new CageListFragment();
@@ -45,9 +45,8 @@ public class CageListFragment extends BaseFragment<CageListDelegate> implements 
 
     private int currentFilter = FILTER_ALL;
 
-    private final List<Object> data = new ArrayList<>();
-
-    private MainAdapter adapter;
+    private final List<String> groups = new ArrayList<>();
+    private final List<List<Object>> data = new ArrayList<>();
 
     public CageListFragment() {
         // Required empty public constructor
@@ -89,7 +88,7 @@ public class CageListFragment extends BaseFragment<CageListDelegate> implements 
 
     @Override
     protected void onLoaded(@Nullable Bundle state) {
-        adapter = getViewDelegate().newAdapter(data, this);
+        getViewDelegate().setupList(groups, data);
 
         if (state != null) {
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
@@ -123,40 +122,40 @@ public class CageListFragment extends BaseFragment<CageListDelegate> implements 
 
     private void loadAll() {
         List<CageEntity> entities = getDatabase().cageDao().all();
-        List<Object> grouped = grouping(entities);
+        Map<String, List<Object>> grouped = grouping(entities);
         AppExecutors.getInstance().mainThread(() -> updateAll(grouped));
     }
 
     private void loadAll(CageModel.Status status) {
         List<CageEntity> entities = getDatabase().cageDao().loadByStatus(status);
-        List<Object> grouped = grouping(entities);
+        Map<String, List<Object>> grouped = grouping(entities);
         AppExecutors.getInstance().mainThread(() -> updateAll(grouped));
     }
 
-    private void updateAll(List<Object> grouped) {
-        Log.d(TAG, "updateAll: " + grouped.size());
-        data.clear();
-        data.addAll(grouped);
-        adapter.notifyDataSetChanged();
+    private void updateAll(Map<String, List<Object>> grouped) {
+        this.groups.clear();
+        this.data.clear();
+
+        grouped.forEach((key, value) -> {
+            this.groups.add(key);
+            this.data.add(value);
+        });
+
+        getViewDelegate().updateList();
     }
 
-    private List<Object> grouping(List<CageEntity> entities) {
+    private Map<String, List<Object>> grouping(List<CageEntity> entities) {
         Multimap<String, CageEntity> multimap = ArrayListMultimap.create();
         entities.forEach(entity -> {
             String group = entity.getSerialNumber().substring(0, 5);
             multimap.put(group, entity);
         });
-        List<Object> result = new ArrayList<>();
+        Map<String, List<Object>> result = new HashMap<>();
         multimap.keySet().forEach(key -> {
             Collection<CageEntity> items = multimap.get(key);
-            result.add(new GroupBO(key, items.size()));
-            result.addAll(items);
+            result.put(new GroupBO(key, items.size()).toString(), new ArrayList<>(items));
         });
         return result;
     }
 
-    @Override
-    public void onItemClick(int position, Object item) {
-
-    }
 }

@@ -2,10 +2,10 @@ package cn.wrh.smart.dove.presenter;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -13,7 +13,9 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
@@ -26,16 +28,13 @@ import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.util.EggLifecycle;
 import cn.wrh.smart.dove.util.TaskBuilder;
 import cn.wrh.smart.dove.view.TaskListDelegate;
-import cn.wrh.smart.dove.view.snippet.MainAdapter;
-import cn.wrh.smart.dove.view.snippet.OnItemClickListener;
-import cn.wrh.smart.dove.view.snippet.OnItemLongClickListener;
 
 /**
  * @author bruce.wu
  * @date 2018/7/14
  */
 public class TaskListFragment extends BaseFragment<TaskListDelegate>
-        implements OnItemClickListener, OnItemLongClickListener {
+        implements TaskListDelegate.ActionListener {
 
     public static TaskListFragment newInstance() {
         return new TaskListFragment();
@@ -48,12 +47,16 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     private int currentFilter = FILTER_ALL;
 
-    private final List<Object> data = new ArrayList<>();
-
-    private MainAdapter adapter;
+    private final List<String> groups = new ArrayList<>();
+    private final List<List<Object>> data = new ArrayList<>();
 
     public TaskListFragment() {
 
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(STATE_FILTER, currentFilter);
     }
 
     @Override
@@ -105,7 +108,13 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     @Override
     protected void onLoaded(@Nullable Bundle state) {
-        adapter = getViewDelegate().newAdapter(data, this, this);
+        getViewDelegate().setupList(groups, data);
+        getViewDelegate().setActionListener(this);
+
+        if (state != null) {
+            currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
+        }
+
         reload();
     }
 
@@ -121,76 +130,45 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     private void loadAllTasks() {
         List<TaskBO> tasks = getDatabase().taskDao().today();
-        List<Object> grouped = grouping(tasks);
+        Map<String, List<Object>> grouped = grouping(tasks);
         AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
     }
 
     private void loadTasks(TaskModel.Status status) {
         List<TaskBO> tasks = getDatabase().taskDao().todayWithStatus(status);
-        List<Object> grouped = grouping(tasks);
+        Map<String, List<Object>> grouped = grouping(tasks);
         AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
     }
 
-    private void updateTasks(List<Object> grouped) {
-        data.clear();
-        data.addAll(grouped);
-        adapter.notifyDataSetChanged();
+    private void updateTasks(Map<String, List<Object>> grouped) {
+        this.groups.clear();
+        this.data.clear();
+
+        grouped.forEach((key, value) -> {
+            this.groups.add(key);
+            this.data.add(value);
+        });
+
+        getViewDelegate().updateList();
     }
 
-    private List<Object> grouping(List<TaskBO> entities) {
+    private Map<String, List<Object>> grouping(List<TaskBO> entities) {
         Multimap<String, TaskBO> multimap = ArrayListMultimap.create();
         entities.forEach(entity -> {
             String group = entity.getCageSn().substring(0, 5);
             multimap.put(group, entity);
         });
-        List<Object> result = new ArrayList<>();
+        Map<String, List<Object>> result = new HashMap<>();
         multimap.keySet().forEach(key -> {
             Collection<TaskBO> items = multimap.get(key);
-            result.add(new GroupBO(key, items.size()));
-            result.addAll(items);
+            result.put(new GroupBO(key, items.size()).toString(), new ArrayList<>(items));
         });
         return result;
     }
 
     @Override
-    public void onItemClick(int position, Object item) {
-        Toast.makeText(getContext(), "onItemClick", Toast.LENGTH_SHORT).show();
-        //TODO show egg details
-    }
-
-    @Override
-    public void onItemLongClick(int position, Object item) {
-        getViewDelegate().showActionDialog((dialog, which) -> onTaskAction(position, which));
-    }
-
-    private void onTaskAction(final int position, int which) {
-        switch (which) {
-            case 0: //已经确认
-                AppExecutors.getInstance().diskIO(() -> confirmTask(position));
-                break;
-            case 1: //明天在看
-                AppExecutors.getInstance().diskIO(() -> finishTask(position));
-                break;
-        }
-    }
-
-    private void finishTask(int position) {
-        TaskBO bo = (TaskBO)data.get(position);
-        Date now = DateUtils.now().toDate();
-        bo.setFinishedAt(now);
-        bo.setStatus(TaskModel.Status.Finished);
-
-        TaskDao dao = getDatabase().taskDao();
-        TaskEntity entity = dao.fetch(bo.getId());
-        entity.setFinishedAt(now);
-        entity.setStatus(TaskModel.Status.Finished);
-        dao.update(entity);
-
-        updateItem(position);
-    }
-
-    private void confirmTask(int position) {
-        TaskBO bo = (TaskBO)data.get(position);
+    public void onConfirm(int groupPosition, int childPosition) {
+        TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
         EggLifecycle lifecycle = EggLifecycle.create(getDatabase());
         switch (bo.getType()) {
             case Lay1:
@@ -209,11 +187,21 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
                 lifecycle.toSold(bo);
                 break;
         }
-        finishTask(position);
+        onFinish(groupPosition, childPosition);
     }
 
-    private void updateItem(final int position) {
-        AppExecutors.getInstance().mainThread(() -> adapter.notifyItemChanged(position));
-    }
+    @Override
+    public void onFinish(int groupPosition, int childPosition) {
+        Date now = DateUtils.now().toDate();
 
+        TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
+        bo.setFinishedAt(now);
+        bo.setStatus(TaskModel.Status.Finished);
+
+        TaskDao dao = getDatabase().taskDao();
+        TaskEntity entity = dao.fetch(bo.getId());
+        entity.setFinishedAt(now);
+        entity.setStatus(TaskModel.Status.Finished);
+        dao.update(entity);
+    }
 }
