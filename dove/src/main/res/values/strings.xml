@@ -22,6 +22,8 @@
     <string name="lbl_first">起始*</string>
     <string name="lbl_last">结束*</string>
     <string name="lbl_status">状态*</string>
+    <string name="lbl_cage">笼位*</string>
+    <string name="lbl_laying">下蛋*</string>
     <string name="save">保存</string>
     <string name="first_cant_gt_last">起始序号不能大于结束序号</string>
     <string name="reset_confirm">是否放弃今日工作进度并重新计算今日工作内容？</string>

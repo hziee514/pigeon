@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import cn.wrh.smart.dove.R;
+import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.domain.bo.EggBO;
 import cn.wrh.smart.dove.domain.model.EggModel;
 import cn.wrh.smart.dove.domain.vo.EggVO;
@@ -60,7 +61,7 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
     }
 
     private void onAdd() {
-
+        Router.route(getActivity(), AddEggActivity.class);
     }
 
     private void onGrouping() {

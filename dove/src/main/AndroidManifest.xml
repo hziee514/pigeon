@@ -25,6 +25,7 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presenter.AddCageActivity" />
+        <activity android:name=".presenter.AddEggActivity" />
     </application>
 
 </manifest>

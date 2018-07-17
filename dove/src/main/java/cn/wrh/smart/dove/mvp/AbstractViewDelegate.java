@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,10 @@ public abstract class AbstractViewDelegate implements ViewDelegate {
 
     public Resources getResources() {
         return rootView.getResources();
+    }
+
+    public String getString(@StringRes int resId) {
+        return getResources().getString(resId);
     }
 
     public void setOnClickListener(View.OnClickListener listener, @IdRes int...ids) {
