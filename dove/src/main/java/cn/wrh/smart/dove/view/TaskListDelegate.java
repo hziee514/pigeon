@@ -1,6 +1,5 @@
 package cn.wrh.smart.dove.view;
 
-import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,12 +7,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.function.IntConsumer;
 
-import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author bruce.wu
@@ -48,11 +50,11 @@ public class TaskListDelegate extends AbstractListDelegate {
                 .show();
     }
 
-    public void showFilterDialog(int selected, final DialogInterface.OnClickListener clickListener) {
+    public void showFilterDialog(int selected, final IntConsumer consumer) {
         new AlertDialog.Builder(getActivity())
                 .setSingleChoiceItems(R.array.task_filters, selected, (dialog, which) -> {
                     dialog.dismiss();
-                    clickListener.onClick(dialog, which);
+                    consumer.accept(which);
                 })
                 .show();
     }
@@ -93,32 +95,39 @@ public class TaskListDelegate extends AbstractListDelegate {
                         if (actionListener == null) {
                             return;
                         }
-                        Runnable runnable = () -> finishTask(view, groupPosition, childPosition);
-                        onAction(which, groupPosition, childPosition, runnable);
+                        switch (which) {
+                            case 0: //已经确认
+                                doConfirm(view, groupPosition, childPosition);
+                                break;
+                            case 1: //明天在看
+                                doFinish(view, groupPosition, childPosition);
+                                break;
+                        }
                     })
                     .show();
             return true;
         }
 
-        private void onAction(int which, int groupPosition, int childPosition, Runnable runnable) {
-            AppExecutors executors = AppExecutors.getInstance();
-            switch (which) {
-                case 0: //已经确认
-                    executors.diskIO(() -> {
+        private void doConfirm(View view, int groupPosition, int childPosition) {
+            Flowable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .map(i -> {
                         actionListener.onConfirm(groupPosition, childPosition);
-                        runnable.run();
-                    });
-                case 1: //明天在看
-                    executors.diskIO(() -> {
-                        actionListener.onFinish(groupPosition, childPosition);
-                        runnable.run();
-                    });
-                    break;
-            }
+                        return i;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(i -> bindChild(view, groupPosition, childPosition));
         }
 
-        private void finishTask(View view, int groupPosition, int childPosition) {
-            AppExecutors.getInstance().mainThread(() -> bindChild(view, groupPosition, childPosition));
+        private void doFinish(View view, int groupPosition, int childPosition) {
+            Flowable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .map(i -> {
+                        actionListener.onFinish(groupPosition, childPosition);
+                        return i;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(i -> bindChild(view, groupPosition, childPosition));
         }
 
         private void setName(View view, String name) {

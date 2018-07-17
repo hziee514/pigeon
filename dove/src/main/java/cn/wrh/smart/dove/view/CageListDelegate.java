@@ -1,12 +1,12 @@
 package cn.wrh.smart.dove.view;
 
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.function.IntConsumer;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
@@ -29,11 +29,11 @@ public class CageListDelegate extends AbstractListDelegate {
         return new CageExpandableListAdapter(groups, data);
     }
 
-    public void showFilterDialog(int selected, DialogInterface.OnClickListener clickListener) {
+    public void showFilterDialog(int selected, IntConsumer consumer) {
         new AlertDialog.Builder(getActivity())
                 .setSingleChoiceItems(R.array.cage_filters, selected, (dialog, which) -> {
                     dialog.dismiss();
-                    clickListener.onClick(dialog, which);
+                    consumer.accept(which);
                 })
                 .show();
     }

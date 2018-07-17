@@ -1,12 +1,8 @@
 package cn.wrh.smart.dove.presenter;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,13 +12,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.bo.EggBO;
-import cn.wrh.smart.dove.domain.bo.GroupBO;
 import cn.wrh.smart.dove.domain.model.EggModel;
 import cn.wrh.smart.dove.domain.vo.EggVO;
 import cn.wrh.smart.dove.view.EggListDelegate;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+import static cn.wrh.smart.dove.domain.vo.EggVO.GROUP_DATE;
 
 /**
  * @author bruce.wu
@@ -37,7 +36,7 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
     private final List<String> groups = new ArrayList<>();
     private final List<List<Object>> data = new ArrayList<>();
 
-    private int groupMethod = EggVO.GROUP_DATE;
+    private int groupMethod = GROUP_DATE;
     private String[] stages;
 
     public EggListFragment() {
@@ -68,7 +67,7 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
         getViewDelegate().showGroupDialog(groupMethod, this::onGroupSelected);
     }
 
-    private void onGroupSelected(DialogInterface dialogInterface, int which) {
+    private void onGroupSelected(int which) {
         if (groupMethod == which) {
             return;
         }
@@ -84,72 +83,42 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
         reload();
     }
 
+    /**
+     * group by stage:
+     *  key -> stage
+     *  value -> sn, dt
+     *
+     * group by date:
+     *  key -> dt
+     *  fields -> sn, stage
+     */
     private void reload() {
-        AppExecutors.getInstance().diskIO(this::loadAll);
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .map(i -> getDatabase().eggDao().withoutStage(EggModel.Stage.Sold))
+                .observeOn(Schedulers.computation())
+                .concatMap(Flowable::fromIterable)
+                .map(a -> getEggVO(a, groupMethod))
+                .toMultimap(a -> isGroupByDate() ? a.getDate() : a.getStageText())
+                .map(TreeMap::new)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateAll);
     }
 
     private boolean isGroupByDate() {
-        return groupMethod == EggVO.GROUP_DATE;
+        return groupMethod == GROUP_DATE;
     }
 
-    private void loadAll() {
-        List<EggBO> items = getDatabase().eggDao().withoutStage(EggModel.Stage.Sold);
-        Map<String, List<Object>> grouped = isGroupByDate() ? groupingByDate(items) : groupingByStage(items);
-        AppExecutors.getInstance().mainThread(() -> updateAll(grouped));
-    }
-
-    private void updateAll(Map<String, List<Object>> grouped) {
+    private void updateAll(Map<String, Collection<EggVO>> grouped) {
         this.groups.clear();
         this.data.clear();
 
         grouped.forEach((key, value) -> {
             this.groups.add(key);
-            this.data.add(value);
+            this.data.add(new ArrayList<>(value));
         });
 
         getViewDelegate().updateList();
-    }
-
-    /**
-     * key -> stage
-     * value -> sn, dt
-     *
-     * @param items data set
-     * @return grouped
-     */
-    private Map<String, List<Object>> groupingByStage(List<EggBO> items) {
-        Multimap<String, EggVO> multimap = ArrayListMultimap.create();
-        items.forEach(item -> {
-            String group = stages[item.getStage().ordinal()];
-            multimap.put(group, getEggVO(item, EggVO.GROUP_STAGE));
-        });
-        Map<String, List<Object>> result = new TreeMap<>();
-        multimap.keySet().forEach(key -> {
-            Collection<EggVO> children = multimap.get(key);
-            result.put(new GroupBO(key, children.size()).toString(), new ArrayList<>(children));
-        });
-        return result;
-    }
-
-    /**
-     * key -> dt
-     * fields -> sn, stage
-     *
-     * @param items data set
-     * @return grouped
-     */
-    private Map<String, List<Object>> groupingByDate(List<EggBO> items) {
-        Multimap<String, EggVO> multimap = ArrayListMultimap.create();
-        items.forEach(item -> {
-            EggVO vo = getEggVO(item, EggVO.GROUP_DATE);
-            multimap.put(vo.getDate(), vo);
-        });
-        Map<String, List<Object>> result = new TreeMap<>();
-        multimap.keySet().forEach(key -> {
-            Collection<EggVO> children = multimap.get(key);
-            result.put(new GroupBO(key, children.size()).toString(), new ArrayList<>(children));
-        });
-        return result;
     }
 
     private EggVO getEggVO(EggBO bo, int groupMethod) {

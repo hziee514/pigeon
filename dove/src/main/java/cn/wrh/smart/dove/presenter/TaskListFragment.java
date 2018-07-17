@@ -1,33 +1,30 @@
 package cn.wrh.smart.dove.presenter;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
-import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.dao.TaskDao;
 import cn.wrh.smart.dove.dal.entity.TaskEntity;
-import cn.wrh.smart.dove.domain.bo.GroupBO;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.util.EggLifecycle;
 import cn.wrh.smart.dove.util.TaskBuilder;
 import cn.wrh.smart.dove.view.TaskListDelegate;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author bruce.wu
@@ -80,27 +77,29 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     }
 
     private void doReset() {
-        AppExecutors.getInstance().diskIO(this::doResetInTransaction);
-    }
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .subscribe(i -> {
+                    final TaskBuilder builder = new TaskBuilder(getDatabase());
 
-    private void doResetInTransaction() {
-        TaskBuilder builder = new TaskBuilder(getDatabase());
-        builder.clear();
-        builder.buildFirst1();
-        builder.buildFirst2();
-        builder.buildSecond();
-        builder.buildReview();
-        builder.buildHatch();
-        builder.buildSell();
+                    builder.clear();
 
-        reload();
+                    builder.buildFirst1();
+                    builder.buildFirst2();
+                    builder.buildSecond();
+                    builder.buildReview();
+                    builder.buildHatch();
+                    builder.buildSell();
+
+                    reload();
+                });
     }
 
     private void onFilter() {
         getViewDelegate().showFilterDialog(currentFilter, this::onFilterSelected);
     }
 
-    private void onFilterSelected(DialogInterface dialog, int which) {
+    private void onFilterSelected(int which) {
         if (currentFilter == which) {
             return;
         }
@@ -122,50 +121,35 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     private void reload() {
         Log.i(TAG, "current filter: " + currentFilter);
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .map(i -> queryFiltered())
+                .subscribeOn(Schedulers.computation())
+                .concatMap(Flowable::fromIterable)
+                .toMultimap(bo -> bo.getCageSn().substring(0, 5))
+                .map(TreeMap::new)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateAll);
+    }
+
+    private List<TaskBO> queryFiltered() {
         if (currentFilter == FILTER_ALL) {
-            AppExecutors.getInstance().diskIO(this::loadAllTasks);
+            return getDatabase().taskDao().today();
         } else {
-            TaskModel.Status status = TaskModel.Status.values()[currentFilter];
-            AppExecutors.getInstance().diskIO(() -> loadTasks(status));
+            return getDatabase().taskDao().today(TaskModel.Status.values()[currentFilter]);
         }
     }
 
-    private void loadAllTasks() {
-        List<TaskBO> tasks = getDatabase().taskDao().today();
-        Map<String, List<Object>> grouped = grouping(tasks);
-        AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
-    }
-
-    private void loadTasks(TaskModel.Status status) {
-        List<TaskBO> tasks = getDatabase().taskDao().todayWithStatus(status);
-        Map<String, List<Object>> grouped = grouping(tasks);
-        AppExecutors.getInstance().mainThread(() -> updateTasks(grouped));
-    }
-
-    private void updateTasks(Map<String, List<Object>> grouped) {
+    private void updateAll(Map<String, Collection<TaskBO>> grouped) {
         this.groups.clear();
         this.data.clear();
 
         grouped.forEach((key, value) -> {
             this.groups.add(key);
-            this.data.add(value);
+            this.data.add(new ArrayList<>(value));
         });
 
         getViewDelegate().updateList();
-    }
-
-    private Map<String, List<Object>> grouping(List<TaskBO> entities) {
-        Multimap<String, TaskBO> multimap = ArrayListMultimap.create();
-        entities.forEach(entity -> {
-            String group = entity.getCageSn().substring(0, 5);
-            multimap.put(group, entity);
-        });
-        Map<String, List<Object>> result = new HashMap<>();
-        multimap.keySet().forEach(key -> {
-            Collection<TaskBO> items = multimap.get(key);
-            result.put(new GroupBO(key, items.size()).toString(), new ArrayList<>(items));
-        });
-        return result;
     }
 
     @Override

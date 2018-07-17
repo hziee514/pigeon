@@ -45,6 +45,6 @@ public interface TaskDao {
             "FROM TASK a, CAGE b " +
             "WHERE a.CAGE_ID = b.ID and a.STATUS = :status and date(a.CREATED_AT) = date('now','localtime') " +
             "order by CAGE_SN, type, FINISHED_AT ")
-    List<TaskBO> todayWithStatus(TaskModel.Status status);
+    List<TaskBO> today(TaskModel.Status status);
 
 }

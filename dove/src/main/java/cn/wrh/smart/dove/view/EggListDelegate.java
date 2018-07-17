@@ -1,11 +1,11 @@
 package cn.wrh.smart.dove.view;
 
-import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.function.IntConsumer;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.vo.EggVO;
@@ -27,11 +27,11 @@ public class EggListDelegate extends AbstractListDelegate {
         return new EggExpandableListAdapter(groups, data);
     }
 
-    public void showGroupDialog(int selected, final DialogInterface.OnClickListener clickListener) {
+    public void showGroupDialog(int selected, final IntConsumer consumer) {
         new AlertDialog.Builder(getActivity())
                 .setSingleChoiceItems(R.array.egg_groups, selected, (dialog, which) -> {
                     dialog.dismiss();
-                    clickListener.onClick(dialog, which);
+                    consumer.accept(which);
                 })
                 .show();
     }

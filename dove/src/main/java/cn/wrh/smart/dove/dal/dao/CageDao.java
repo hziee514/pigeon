@@ -11,6 +11,7 @@ import java.util.List;
 
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.domain.model.CageModel;
+import io.reactivex.Flowable;
 
 /**
  * @author bruce.wu
@@ -29,9 +30,9 @@ public interface CageDao {
     void delete(CageEntity...entities);
 
     @Query("SELECT * FROM CAGE ORDER BY SERIAL_NUMBER")
-    List<CageEntity> all();
+    List<CageEntity> query();
 
     @Query("SELECT * FROM CAGE WHERE STATUS = :status ORDER BY SERIAL_NUMBER")
-    List<CageEntity> loadByStatus(CageModel.Status status);
+    List<CageEntity> query(CageModel.Status status);
 
 }
