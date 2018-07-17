@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
-import cn.wrh.smart.dove.domain.event.BatchCageAddedEvent;
+import cn.wrh.smart.dove.domain.event.BatchCageAdded;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.view.CageListDelegate;
 import io.reactivex.Flowable;
@@ -106,7 +106,7 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
 
     @SuppressWarnings("unused")
     @Subscribe
-    public void onBatchCageAdded(BatchCageAddedEvent e) {
+    public void onBatchCageAdded(BatchCageAdded e) {
         Log.d(TAG, "onBatchCageAdded: " + e.getCount());
         reload();
     }

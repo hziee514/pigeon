@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -14,17 +16,23 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import cn.wrh.smart.dove.R;
+import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.dal.dao.TaskDao;
+import cn.wrh.smart.dove.dal.entity.EggEntity;
 import cn.wrh.smart.dove.dal.entity.TaskEntity;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
+import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.util.EggLifecycle;
 import cn.wrh.smart.dove.util.TaskBuilder;
+import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.TaskListDelegate;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import static cn.wrh.smart.dove.Router.EXTRA_EGG_ID;
 
 /**
  * @author bruce.wu
@@ -111,6 +119,7 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     protected void onLoaded(@Nullable Bundle state) {
         getViewDelegate().setupList(groups, data);
         getViewDelegate().setActionListener(this);
+        getViewDelegate().setOnItemClick(this::onItemClicked);
 
         if (state != null) {
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
@@ -156,23 +165,25 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     public void onConfirm(int groupPosition, int childPosition) {
         TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
         EggLifecycle lifecycle = EggLifecycle.create(getDatabase());
+        EggEntity entity = null;
         switch (bo.getType()) {
             case Lay1:
-                lifecycle.toLaid1(bo);
+                entity = lifecycle.toLaid1(bo);
                 break;
             case Lay2:
-                lifecycle.toLaid2(bo);
+                entity = lifecycle.toLaid2(bo);
                 break;
             case Review:
-                lifecycle.toReviewed(bo);
+                entity = lifecycle.toReviewed(bo);
                 break;
             case Hatch:
-                lifecycle.toHatched(bo);
+                entity = lifecycle.toHatched(bo);
                 break;
             case Sell:
-                lifecycle.toSold(bo);
+                entity = lifecycle.toSold(bo);
                 break;
         }
+        EventBus.getDefault().post(new SingleEggEdited(entity));
         onFinish(groupPosition, childPosition);
     }
 
@@ -190,4 +201,14 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
         entity.setStatus(TaskModel.Status.Finished);
         dao.update(entity);
     }
+
+    public void onItemClicked(Tuple<Integer, Integer> args) {
+        TaskBO bo = (TaskBO)data.get(args.getFirst()).get(args.getSecond());
+        if (bo.getEggId() > 0) {
+            Bundle bundle = new Bundle();
+            bundle.putInt(EXTRA_EGG_ID, bo.getEggId());
+            Router.route(getActivity(), AddEggActivity.class, bundle);
+        }
+    }
+
 }

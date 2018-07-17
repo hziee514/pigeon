@@ -13,7 +13,7 @@ import cn.wrh.smart.dove.domain.model.TaskModel;
  * @author bruce.wu
  * @date 2018/7/14
  */
-@Entity(tableName = "TASK")
+@Entity(tableName = "T_TASK")
 public class TaskEntity implements TaskModel {
 
     @PrimaryKey(autoGenerate = true)

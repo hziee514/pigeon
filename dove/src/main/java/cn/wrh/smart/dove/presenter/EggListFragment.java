@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +18,10 @@ import java.util.TreeMap;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.domain.bo.EggBO;
+import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.EggModel;
 import cn.wrh.smart.dove.domain.vo.EggVO;
+import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.EggListDelegate;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -80,7 +85,21 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
     protected void onLoaded(@Nullable Bundle state) {
         stages = getResources().getStringArray(R.array.egg_stages);
         getViewDelegate().setupList(groups, data);
+        getViewDelegate().setOnItemClick(this::onItemClicked);
 
+        reload();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onUnload() {
+        EventBus.getDefault().unregister(this);
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onSingleEggEdited(SingleEggEdited e) {
         reload();
     }
 
@@ -147,6 +166,13 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
                 return sdf.format(bo.getSoldAt());
         }
         throw new NullPointerException();
+    }
+
+    private void onItemClicked(Tuple<Integer, Integer> args) {
+        EggVO vo = (EggVO)data.get(args.getFirst()).get(args.getSecond());
+        Bundle bundle = new Bundle();
+        bundle.putInt(Router.EXTRA_EGG_ID, vo.getId());
+        Router.route(getActivity(), AddEggActivity.class, bundle);
     }
 
 }

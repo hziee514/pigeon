@@ -14,7 +14,7 @@ import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.AppDatabase;
 import cn.wrh.smart.dove.dal.dao.CageDao;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
-import cn.wrh.smart.dove.domain.event.BatchCageAddedEvent;
+import cn.wrh.smart.dove.domain.event.BatchCageAdded;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.view.AddCageDelegate;
@@ -67,7 +67,7 @@ public class AddCageActivity extends BaseActivity<AddCageDelegate> {
                 Log.v(TAG, "insert cage: " + sn);
             }
         });
-        EventBus.getDefault().post(new BatchCageAddedEvent(last - first + 1));
+        EventBus.getDefault().post(new BatchCageAdded(last - first + 1));
         finish();
     }
 

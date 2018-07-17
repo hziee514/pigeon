@@ -11,6 +11,8 @@ import android.os.Bundle;
  */
 public class Router {
 
+    public static final String EXTRA_EGG_ID = "eggId";
+
     public static void route(Context context, String className) {
         route(context, className, new Bundle());
     }

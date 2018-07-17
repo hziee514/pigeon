@@ -4,14 +4,15 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
+import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,6 +26,8 @@ public class TaskListDelegate extends AbstractListDelegate {
 
     private ActionListener actionListener;
 
+    private Consumer<Tuple<Integer, Integer>> onItemClick;
+
     @Override
     public int getOptionsMenuId() {
         return R.menu.main_tab_task;
@@ -32,6 +35,10 @@ public class TaskListDelegate extends AbstractListDelegate {
 
     public void setActionListener(ActionListener listener) {
         this.actionListener = listener;
+    }
+
+    public void setOnItemClick(Consumer<Tuple<Integer, Integer>> listener) {
+        this.onItemClick = listener;
     }
 
     @Override
@@ -84,7 +91,9 @@ public class TaskListDelegate extends AbstractListDelegate {
 
         @Override
         protected void onItemClick(View view, int groupPosition, int childPosition) {
-            Toast.makeText(getActivity(), "onItemClick", Toast.LENGTH_SHORT).show();
+            if (onItemClick != null) {
+                onItemClick.accept(new Tuple<>(groupPosition, childPosition));
+            }
         }
 
         @Override

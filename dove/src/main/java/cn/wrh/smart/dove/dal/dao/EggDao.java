@@ -29,13 +29,22 @@ public interface EggDao {
     @Delete
     void delete(EggEntity...entities);
 
-    @Query("SELECT * FROM EGG WHERE id = :id")
+    @Query("DELETE FROM T_EGG WHERE ID = :id")
+    void delete(int id);
+
+    @Query("SELECT * FROM T_EGG WHERE id = :id")
     EggEntity fetch(int id);
 
     @Query("SELECT a.*, b.SERIAL_NUMBER as CAGE_SN " +
-            "FROM EGG a, CAGE b " +
+            "FROM T_EGG a, T_CAGE b " +
+            "WHERE a.CAGE_ID = b.ID AND a.ID = :id " +
+            "LIMIT 1 ")
+    EggBO findById(int id);
+
+    @Query("SELECT a.*, b.SERIAL_NUMBER as CAGE_SN " +
+            "FROM T_EGG a, T_CAGE b " +
             "WHERE a.CAGE_ID = b.ID AND a.STAGE != :stage " +
-            "ORDER BY CAGE_SN")
+            "ORDER BY b.SERIAL_NUMBER")
     List<EggBO> withoutStage(EggModel.Stage stage);
 
 }

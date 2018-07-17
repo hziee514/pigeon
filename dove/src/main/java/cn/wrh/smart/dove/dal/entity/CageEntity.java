@@ -14,7 +14,7 @@ import cn.wrh.smart.dove.domain.model.CageModel;
  * @author bruce.wu
  * @date 2018/7/9
  */
-@Entity(tableName = "CAGE", indices = {
+@Entity(tableName = "T_CAGE", indices = {
         @Index(value = {"SERIAL_NUMBER"}, unique = true)
 })
 public class CageEntity implements CageModel {

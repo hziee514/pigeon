@@ -21,7 +21,7 @@
         <TextView
             android:text="@string/lbl_room"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/room"
             tools:entries="@array/rooms"
@@ -31,7 +31,7 @@
         <TextView
             android:text="@string/lbl_group"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/group"
             tools:entries="@array/groups"
@@ -40,7 +40,7 @@
         <TextView
             android:text="@string/lbl_layer"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/layer"
             tools:entries="@array/layers"
@@ -49,7 +49,7 @@
         <TextView
             android:text="@string/lbl_first"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/first"
             tools:entries="@array/sns"
@@ -58,7 +58,7 @@
         <TextView
             android:text="@string/lbl_last"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/last"
             tools:entries="@array/sns"
@@ -67,7 +67,7 @@
         <TextView
             android:text="@string/lbl_status"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView"/>
         <Spinner
             android:id="@+id/status"
             tools:entries="@array/cage_status"

@@ -29,22 +29,22 @@ public interface TaskDao {
     @Delete
     void delete(TaskEntity...entities);
 
-    @Query("SELECT * FROM TASK WHERE ID = :id")
+    @Query("SELECT * FROM T_TASK WHERE ID = :id")
     TaskEntity fetch(int id);
 
-    @Query("DELETE FROM TASK")
+    @Query("DELETE FROM T_TASK")
     void clear();
 
     @Query("SELECT DISTINCT a.id, a.CAGE_ID, b.SERIAL_NUMBER as CAGE_SN, a.EGG_ID, a.TYPE, a.CREATED_AT, a.FINISHED_AT, a.STATUS " +
-            "FROM TASK a, CAGE b " +
+            "FROM T_TASK a, T_CAGE b " +
             "WHERE a.CAGE_ID = b.ID and date(a.CREATED_AT) = date('now','localtime') " +
-            "order by CAGE_SN, type, FINISHED_AT ")
+            "order by b.SERIAL_NUMBER, type, FINISHED_AT ")
     List<TaskBO> today();
 
     @Query("SELECT DISTINCT a.id, a.CAGE_ID, b.SERIAL_NUMBER as CAGE_SN, a.EGG_ID, a.TYPE, a.CREATED_AT, a.FINISHED_AT, a.STATUS " +
-            "FROM TASK a, CAGE b " +
+            "FROM T_TASK a, T_CAGE b " +
             "WHERE a.CAGE_ID = b.ID and a.STATUS = :status and date(a.CREATED_AT) = date('now','localtime') " +
-            "order by CAGE_SN, type, FINISHED_AT ")
+            "order by b.SERIAL_NUMBER, type, FINISHED_AT ")
     List<TaskBO> today(TaskModel.Status status);
 
 }

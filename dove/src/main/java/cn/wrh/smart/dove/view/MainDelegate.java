@@ -38,11 +38,6 @@ public class MainDelegate extends AbstractViewDelegate
     }
 
     @Override
-    public int getOptionsMenuId() {
-        return R.menu.main;
-    }
-
-    @Override
     public <T extends ViewGroup> T getToolbar() {
         return findViewById(R.id.toolbar);
     }

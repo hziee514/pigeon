@@ -10,6 +10,7 @@ import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import static android.view.View.NO_ID;
 
@@ -60,6 +61,10 @@ public abstract class AbstractViewDelegate implements ViewDelegate {
 
     public <T extends View> T findViewById(@IdRes int id) {
         return rootView.findViewById(id);
+    }
+
+    public TextView getTextView(@IdRes int resId) {
+        return findViewById(resId);
     }
 
     public Context getApplicationContext() {

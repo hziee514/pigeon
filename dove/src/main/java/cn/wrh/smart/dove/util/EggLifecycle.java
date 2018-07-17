@@ -22,46 +22,51 @@ public class EggLifecycle {
         this.database = database;
     }
 
-    public void toLaid1(TaskBO task) {
-        EggEntity egg = new EggEntity();
-        egg.setCageId(task.getCageId());
-        egg.setCount(1);
-        egg.setLayingAt(DateUtils.now().toDate());
-        egg.setStage(EggModel.Stage.Laid1);
-        database.eggDao().insert(egg);
+    public EggEntity toLaid1(TaskBO task) {
+        EggEntity entity = new EggEntity();
+        entity.setCageId(task.getCageId());
+        entity.setCount(1);
+        entity.setLayingAt(DateUtils.now().toDate());
+        entity.setStage(EggModel.Stage.Laid1);
+        database.eggDao().insert(entity);
+        return entity;
     }
 
-    public void toLaid2(TaskBO task) {
+    public EggEntity toLaid2(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
         entity.setCount(2);
         entity.setLayingAt(DateUtils.now().toDate());
         entity.setStage(EggModel.Stage.Laid2);
         dao.update(entity);
+        return entity;
     }
 
-    public void toReviewed(TaskBO task) {
+    public EggEntity toReviewed(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
         entity.setReviewAt(DateUtils.now().toDate());
         entity.setStage(EggModel.Stage.Reviewed);
         dao.update(entity);
+        return entity;
     }
 
-    public void toHatched(TaskBO task) {
+    public EggEntity toHatched(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
         entity.setHatchAt(DateUtils.now().toDate());
         entity.setStage(EggModel.Stage.Hatched);
         dao.update(entity);
+        return entity;
     }
 
-    public void toSold(TaskBO task) {
+    public EggEntity toSold(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
         entity.setSoldAt(DateUtils.now().toDate());
         entity.setStage(EggModel.Stage.Sold);
         dao.update(entity);
+        return entity;
     }
 
 }

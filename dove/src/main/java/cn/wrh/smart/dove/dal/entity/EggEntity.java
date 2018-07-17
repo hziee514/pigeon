@@ -13,7 +13,7 @@ import cn.wrh.smart.dove.domain.model.EggModel;
  * @author bruce.wu
  * @date 2018/7/14
  */
-@Entity(tableName = "EGG")
+@Entity(tableName = "T_EGG")
 public class EggEntity implements EggModel {
 
     @PrimaryKey(autoGenerate = true)
@@ -136,6 +136,29 @@ public class EggEntity implements EggModel {
         this.hatchAt = model.getHatchAt();
         this.soldAt = model.getSoldAt();
         this.stage = model.getStage();
+    }
+
+    public void determineStage() {
+        this.setStage(determineStage(this));
+    }
+
+    public static Stage determineStage(EggEntity entity) {
+        if (entity.getSoldAt() != null) {
+            return Stage.Sold;
+        }
+        if (entity.getHatchAt() != null) {
+            return Stage.Hatched;
+        }
+        if (entity.getReviewAt() != null) {
+            return Stage.Reviewed;
+        }
+        if (entity.getLayingAt() != null && entity.getCount() == 2){
+            return Stage.Laid2;
+        }
+        if (entity.getLayingAt() != null && entity.getCount() == 1) {
+            return Stage.Laid1;
+        }
+        throw new RuntimeException("invalid state");
     }
 
 }

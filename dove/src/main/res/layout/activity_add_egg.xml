@@ -21,26 +21,70 @@
         <TextView
             android:text="@string/lbl_cage"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView" />
         <Spinner
             android:id="@+id/cage_sn"
             tools:entries="@array/rooms"
-            android:gravity="center_vertical|end"
             app:layout_columnWeight="3" />
 
         <TextView
             android:text="@string/lbl_laying"
             app:layout_columnWeight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.TextView" />
         <EditText
             android:id="@+id/laying"
             android:inputType="date"
             android:hint="yyyy-MM-dd"
-            android:gravity="center_vertical|end"
             android:focusable="false"
             app:layout_columnWeight="3"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            style="@style/AppWidget.EditText"/>
+
+        <TextView
+            android:text="@string/lbl_count"
+            app:layout_columnWeight="1"
+            style="@style/AppWidget.TextView" />
+        <Spinner
+            android:id="@+id/count"
+            tools:entries="@array/rooms"
+            app:layout_columnWeight="3" />
+
+        <TextView
+            android:text="@string/lbl_review"
+            app:layout_columnWeight="1"
+            style="@style/AppWidget.TextView" />
+        <EditText
+            android:id="@+id/review"
+            android:inputType="date"
+            android:hint="yyyy-MM-dd"
+            android:focusable="false"
+            app:layout_columnWeight="3"
+            style="@style/AppWidget.EditText"/>
+
+        <TextView
+            android:text="@string/lbl_hatch"
+            app:layout_columnWeight="1"
+            style="@style/AppWidget.TextView" />
+        <EditText
+            android:id="@+id/hatch"
+            android:inputType="date"
+            android:hint="yyyy-MM-dd"
+            android:focusable="false"
+            app:layout_columnWeight="3"
+            style="@style/AppWidget.EditText"/>
 
     </android.support.v7.widget.GridLayout>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:text="@string/save"
+        android:layout_width="match_parent"
+        style="@style/AppWidget.Button" />
+
+    <Button
+        android:id="@+id/btn_del"
+        android:text="@string/delete"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        style="@style/AppWidget.Button" />
 
 </LinearLayout>
