@@ -10,7 +10,6 @@ import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
 
-import cn.wrh.smart.dove.AppExecutors;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.AppDatabase;
 import cn.wrh.smart.dove.dal.dao.CageDao;
@@ -19,6 +18,8 @@ import cn.wrh.smart.dove.domain.event.BatchCageAddedEvent;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.view.AddCageDelegate;
+import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author bruce.wu
@@ -45,7 +46,9 @@ public class AddCageActivity extends BaseActivity<AddCageDelegate> {
             return;
         }
         CageModel.Status s = CageModel.Status.values()[status];
-        new AppExecutors().diskIO(() -> batchAddCage(roomId, groupId, layerId, first, last, s));
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .subscribe(i -> batchAddCage(roomId, groupId, layerId, first, last, s));
     }
 
     private void batchAddCage(String roomId, String groupId, String layerId, int first, int last, CageModel.Status status) {
