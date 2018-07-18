@@ -5,7 +5,9 @@ import com.google.common.collect.Multimap;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.Date;
+
+import cn.wrh.smart.dove.util.DateUtils;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -24,6 +26,13 @@ public class ExampleUnitTest {
         multimap.put("b", "b2");
         multimap.put("b", "b3");
         System.out.println(multimap.toString());
+    }
+
+    @Test
+    public void date() {
+        System.out.println(DateUtils.now());
+        //System.out.println(DateTime.now(DateTimeZone.UTC).toDate());
+        System.out.println(new Date());
     }
 
 }

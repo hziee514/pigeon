@@ -26,7 +26,7 @@ public class EggLifecycle {
         EggEntity entity = new EggEntity();
         entity.setCageId(task.getCageId());
         entity.setCount(1);
-        entity.setLayingAt(DateUtils.now().toDate());
+        entity.setLayingAt(DateUtils.now());
         entity.setStage(EggModel.Stage.Laid1);
         database.eggDao().insert(entity);
         return entity;
@@ -36,7 +36,7 @@ public class EggLifecycle {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
         entity.setCount(2);
-        entity.setLayingAt(DateUtils.now().toDate());
+        entity.setLayingAt(DateUtils.now());
         entity.setStage(EggModel.Stage.Laid2);
         dao.update(entity);
         return entity;
@@ -45,7 +45,7 @@ public class EggLifecycle {
     public EggEntity toReviewed(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
-        entity.setReviewAt(DateUtils.now().toDate());
+        entity.setReviewAt(DateUtils.now());
         entity.setStage(EggModel.Stage.Reviewed);
         dao.update(entity);
         return entity;
@@ -54,7 +54,7 @@ public class EggLifecycle {
     public EggEntity toHatched(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
-        entity.setHatchAt(DateUtils.now().toDate());
+        entity.setHatchAt(DateUtils.now());
         entity.setStage(EggModel.Stage.Hatched);
         dao.update(entity);
         return entity;
@@ -63,7 +63,7 @@ public class EggLifecycle {
     public EggEntity toSold(TaskBO task) {
         EggDao dao = database.eggDao();
         EggEntity entity = dao.fetch(task.getEggId());
-        entity.setSoldAt(DateUtils.now().toDate());
+        entity.setSoldAt(DateUtils.now());
         entity.setStage(EggModel.Stage.Sold);
         dao.update(entity);
         return entity;

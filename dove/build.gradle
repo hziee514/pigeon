@@ -22,17 +22,35 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    signingConfigs {
+        config {
+            keyAlias 'dove'
+            keyPassword '111111'
+            storeFile file("$rootProject.rootDir/dev.jks")
+            storePassword '111111'
+        }
+    }
+
     buildTypes {
         release {
-            shrinkResources false
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 
     testOptions {
@@ -51,7 +69,7 @@ dependencies {
     implementation 'com.android.support:gridlayout-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'joda-time:joda-time:2.9.9'
+    //implementation 'joda-time:joda-time:2.9.9'
     implementation 'com.google.code.gson:gson:2.8.4'
     implementation 'com.google.guava:guava:25.1-android'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'

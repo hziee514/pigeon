@@ -2,9 +2,9 @@
     <string name="app_name">鸽子</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="settings">设置</string>
@@ -30,6 +30,7 @@
     <string name="save">保存</string>
     <string name="delete">删除</string>
     <string name="feed_history">养殖记录</string>
+    <string name="not_implemented">还没有实现</string>
     <string name="first_cant_gt_last">起始序号不能大于结束序号</string>
     <string name="reset_confirm">是否放弃今日工作进度并重新计算今日工作内容？</string>
     <string name="del_egg_confirm">确定要删除这条养殖记录？</string>

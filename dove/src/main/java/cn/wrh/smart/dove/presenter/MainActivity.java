@@ -25,23 +25,12 @@ public class MainActivity extends BaseActivity<MainDelegate>
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_settings:
-                break;
             case R.id.nav_backup:
-                break;
             case R.id.nav_restore:
+                toast(R.string.not_implemented);
                 break;
         }
         getViewDelegate().closeDrawer();

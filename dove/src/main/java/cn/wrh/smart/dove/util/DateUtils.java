@@ -3,14 +3,12 @@ package cn.wrh.smart.dove.util;
 import android.text.TextUtils;
 import android.widget.DatePicker;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @author bruce.wu
@@ -18,8 +16,9 @@ import java.util.Locale;
  */
 public class DateUtils {
 
-    public static DateTime now() {
-        return DateTime.now(DateTimeZone.UTC);
+    public static Date now() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        return calendar.getTime();
     }
 
     public static Calendar getCalendarForEditor(String date) {

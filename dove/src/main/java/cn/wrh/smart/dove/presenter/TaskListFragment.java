@@ -192,7 +192,7 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     @Override
     public void onFinish(int groupPosition, int childPosition) {
-        Date now = DateUtils.now().toDate();
+        Date now = DateUtils.now();
 
         TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
         bo.setFinishedAt(now);
