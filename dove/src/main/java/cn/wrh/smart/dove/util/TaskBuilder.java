@@ -106,7 +106,7 @@ public class TaskBuilder {
                 "FROM T_CAGE a, T_EGG b " +
                 "WHERE a.STATUS != ? " +
                 "AND b.COUNT = 2 AND a.id = b.CAGE_ID " +
-                "AND b.STAGE != ? " +
+                "AND b.STAGE = ? " +
                 "AND date(b.HATCH_AT, '27 day') <= date('now','localtime')";
         database.exec(sql, Sell, Waiting, Idle, EggModel.Stage.Hatched);
     }

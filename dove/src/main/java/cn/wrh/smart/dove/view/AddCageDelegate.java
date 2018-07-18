@@ -1,8 +1,6 @@
 package cn.wrh.smart.dove.view;
 
-import android.support.annotation.IdRes;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.domain.model.CageModel;
@@ -45,10 +43,6 @@ public class AddCageDelegate extends AbstractViewDelegate {
                 R.layout.spinner_dropdown_item,
                 getResources().getStringArray(R.array.cage_status)));
         getSpinner(R.id.status).setSelection(CageModel.Status.Healthy.ordinal());
-    }
-
-    private Spinner getSpinner(@IdRes int id) {
-        return findViewById(id);
     }
 
     public String getRoomId() {

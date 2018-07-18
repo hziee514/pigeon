@@ -8,6 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import java.util.Date;
 
 import cn.wrh.smart.dove.domain.model.EggModel;
+import cn.wrh.smart.dove.util.DateUtils;
 
 /**
  * @author bruce.wu
@@ -136,6 +137,22 @@ public class EggEntity implements EggModel {
         this.hatchAt = model.getHatchAt();
         this.soldAt = model.getSoldAt();
         this.stage = model.getStage();
+    }
+
+    public String getStageDt() {
+        switch (stage) {
+            case Laid1:
+            case Laid2:
+                return DateUtils.getDateForEditor(layingAt);
+            case Reviewed:
+                return DateUtils.getDateForEditor(reviewAt);
+            case Hatched:
+                return DateUtils.getDateForEditor(hatchAt);
+            case Sold:
+                return DateUtils.getDateForEditor(soldAt);
+            default:
+                throw new IllegalStateException("Invalid stage");
+        }
     }
 
     public void determineStage() {

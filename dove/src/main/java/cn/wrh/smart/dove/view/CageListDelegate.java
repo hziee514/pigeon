@@ -6,11 +6,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.domain.model.CageModel;
+import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
 
 /**
@@ -18,6 +20,8 @@ import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
  * @date 2018/7/12
  */
 public class CageListDelegate extends AbstractListDelegate {
+
+    private Consumer<Tuple<Integer, Integer>> onItemClick;
 
     @Override
     public int getOptionsMenuId() {
@@ -27,6 +31,10 @@ public class CageListDelegate extends AbstractListDelegate {
     @Override
     protected MyExpandableListAdapter createAdapter(List<String> groups, List<List<Object>> data) {
         return new CageExpandableListAdapter(groups, data);
+    }
+
+    public void setOnItemClick(Consumer<Tuple<Integer, Integer>> listener) {
+        this.onItemClick = listener;
     }
 
     public void showFilterDialog(int selected, IntConsumer consumer) {
@@ -49,6 +57,13 @@ public class CageListDelegate extends AbstractListDelegate {
             CageEntity entity = (CageEntity)getChild(groupPosition, childPosition);
             setName(view, entity.getSerialNumber());
             setStatus(view, entity.getStatus());
+        }
+
+        @Override
+        protected void onItemClick(View view, int groupPosition, int childPosition) {
+            if (onItemClick != null) {
+                onItemClick.accept(new Tuple<>(groupPosition, childPosition));
+            }
         }
 
         private void setName(View view, String name) {

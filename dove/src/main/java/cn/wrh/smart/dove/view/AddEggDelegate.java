@@ -2,12 +2,10 @@ package cn.wrh.smart.dove.view;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.support.annotation.IdRes;
 import android.support.v7.app.AlertDialog;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -115,7 +113,4 @@ public class AddEggDelegate extends AbstractViewDelegate {
                 .show();
     }
 
-    private Spinner getSpinner(@IdRes int id) {
-        return findViewById(id);
-    }
 }

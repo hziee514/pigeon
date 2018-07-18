@@ -47,4 +47,7 @@ public interface EggDao {
             "ORDER BY b.SERIAL_NUMBER")
     List<EggBO> withoutStage(EggModel.Stage stage);
 
+    @Query("SELECT * FROM T_EGG WHERE CAGE_ID = :cageId")
+    List<EggEntity> queryByCageId(int cageId);
+
 }

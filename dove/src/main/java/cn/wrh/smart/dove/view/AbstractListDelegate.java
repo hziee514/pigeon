@@ -33,6 +33,13 @@ public abstract class AbstractListDelegate extends AbstractViewDelegate {
     }
 
     public void updateList() {
+        updateList(false);
+    }
+
+    public void updateList(boolean expandFirst) {
+        if (expandFirst && adapter.getGroupCount() > 0) {
+            list.expandGroup(0);
+        }
         adapter.notifyDataSetInvalidated();
     }
 

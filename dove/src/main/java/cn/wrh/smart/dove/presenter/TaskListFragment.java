@@ -130,13 +130,16 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
 
     private void reload() {
         Log.i(TAG, "current filter: " + currentFilter);
+        //noinspection Convert2MethodRef
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(i -> queryFiltered())
                 .subscribeOn(Schedulers.computation())
                 .concatMap(Flowable::fromIterable)
-                .toMultimap(bo -> bo.getCageSn().substring(0, 5))
-                .map(TreeMap::new)
+                .toMultimap(bo -> bo.getCageSn().substring(0, 5),
+                        entity -> entity,
+                        () -> new TreeMap<>(),
+                        key -> new ArrayList<>())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateAll);
     }

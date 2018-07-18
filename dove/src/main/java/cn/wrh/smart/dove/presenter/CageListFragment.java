@@ -20,11 +20,15 @@ import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.domain.event.BatchCageAdded;
+import cn.wrh.smart.dove.domain.event.CageStatusChanged;
 import cn.wrh.smart.dove.domain.model.CageModel;
+import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.CageListDelegate;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import static cn.wrh.smart.dove.Router.EXTRA_CAGE_ID;
 
 /**
  * @author bruce.wu
@@ -90,6 +94,7 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
     @Override
     protected void onLoaded(@Nullable Bundle state) {
         getViewDelegate().setupList(groups, data);
+        getViewDelegate().setOnItemClick(this::onItemClicked);
 
         if (state != null) {
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
@@ -111,16 +116,25 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
         reload();
     }
 
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onCageStatusChanged(CageStatusChanged e) {
+        reload();
+    }
+
     @SuppressLint("CheckResult")
     private void reload() {
         Log.i(TAG, "current filter: " + currentFilter);
+        //noinspection Convert2MethodRef
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(i -> queryFiltered())
                 .observeOn(Schedulers.computation())
                 .concatMap(Flowable::fromIterable)
-                .toMultimap(entity -> entity.getSerialNumber().substring(0, 5))
-                .map(TreeMap::new)
+                .toMultimap(entity -> entity.getSerialNumber().substring(0, 5),
+                        entity -> entity,
+                        () -> new TreeMap<>(),
+                        key -> new ArrayList<>())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateAll);
     }
@@ -143,6 +157,13 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
         });
 
         getViewDelegate().updateList();
+    }
+
+    private void onItemClicked(Tuple<Integer, Integer> args) {
+        CageEntity entity = (CageEntity)data.get(args.getFirst()).get(args.getSecond());
+        Bundle bundle = new Bundle();
+        bundle.putInt(EXTRA_CAGE_ID, entity.getId());
+        Router.route(getActivity(), CageInfoActivity.class, bundle);
     }
 
 }

@@ -7,11 +7,9 @@ import android.view.MenuItem;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -113,14 +111,17 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
      *  fields -> sn, stage
      */
     private void reload() {
+        //noinspection Convert2MethodRef
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(i -> getDatabase().eggDao().withoutStage(EggModel.Stage.Sold))
                 .observeOn(Schedulers.computation())
                 .concatMap(Flowable::fromIterable)
                 .map(a -> getEggVO(a, groupMethod))
-                .toMultimap(a -> isGroupByDate() ? a.getDate() : a.getStageText())
-                .map(TreeMap::new)
+                .toMultimap(vo -> isGroupByDate() ? vo.getDate() : vo.getStageText(),
+                        entity -> entity,
+                        () -> new TreeMap<>(),
+                        key -> new ArrayList<>())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateAll);
     }
@@ -147,25 +148,9 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
         vo.setCageId(bo.getCageId());
         vo.setCageSn(bo.getCageSn());
         vo.setStageText(stages[bo.getStage().ordinal()]);
-        vo.setDate(getStageDate(bo));
+        vo.setDate(bo.getStageDt());
         vo.setGroupMethod(groupMethod);
         return vo;
-    }
-
-    private String getStageDate(EggBO bo) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        switch (bo.getStage()) {
-            case Laid1:
-            case Laid2:
-                return sdf.format(bo.getLayingAt());
-            case Reviewed:
-                return sdf.format(bo.getReviewAt());
-            case Hatched:
-                return sdf.format(bo.getHatchAt());
-            case Sold:
-                return sdf.format(bo.getSoldAt());
-        }
-        throw new NullPointerException();
     }
 
     private void onItemClicked(Tuple<Integer, Integer> args) {
