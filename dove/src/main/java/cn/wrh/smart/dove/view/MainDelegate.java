@@ -1,5 +1,6 @@
 package cn.wrh.smart.dove.view;
 
+import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.BottomNavigationView;
@@ -33,6 +34,7 @@ public class MainDelegate extends AbstractViewDelegate
     private DrawerLayout drawer;
     private ViewPager pager;
     private BottomNavigationView navigationView;
+    private ProgressDialog progressDialog;
 
     @Override
     public int getRootLayoutId() {
@@ -59,24 +61,40 @@ public class MainDelegate extends AbstractViewDelegate
         initPager(((MainActivity)getActivity()).getSupportFragmentManager());
     }
 
+    private void showWaiting() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage(getString(R.string.waiting_message));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    private void hideWaiting() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
     public void showWarnDialog(Runnable consumer, @StringRes int resId, Object...args) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(getString(resId, args))
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     dialog.dismiss();
+                    showWaiting();
                     consumer.run();
                 })
                 .show();
     }
 
     public void showResultDialog(@StringRes int resId, Object...args) {
-        getActivity().runOnUiThread(() ->
-                new AlertDialog.Builder(getActivity())
-                        .setMessage(getString(resId, args))
-                        .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-                        .show()
-        );
+        getActivity().runOnUiThread(() -> {
+            hideWaiting();
+            new AlertDialog.Builder(getActivity())
+                    .setMessage(getString(resId, args))
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                    .show();
+        });
     }
 
     public void setNavigationItemSelectedListener(NavigationView.OnNavigationItemSelectedListener listener) {

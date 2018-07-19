@@ -38,4 +38,5 @@
     <string name="backup_warn_message">是否备份当前数据到文件\n路径: %1$s</string>
     <string name="backup_complete_message">备份成功: 笼位=%1$d,鸽蛋=%2$d</string>
     <string name="backup_error_message">备份失败: %1$s</string>
+    <string name="waiting_message">请稍等...</string>
 </resources>

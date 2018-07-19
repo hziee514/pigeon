@@ -27,6 +27,7 @@ import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.util.DateUtils;
 import cn.wrh.smart.dove.util.EggLifecycle;
+import cn.wrh.smart.dove.util.GroupUtils;
 import cn.wrh.smart.dove.util.TaskBuilder;
 import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.TaskListDelegate;
@@ -172,7 +173,7 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
         this.data.clear();
 
         grouped.forEach((key, value) -> {
-            this.groups.add(key);
+            this.groups.add(GroupUtils.getGroupText(key, value.size()));
             this.data.add(new ArrayList<>(value));
         });
 

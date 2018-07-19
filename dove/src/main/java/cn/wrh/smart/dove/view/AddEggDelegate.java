@@ -49,6 +49,7 @@ public class AddEggDelegate extends AbstractViewDelegate {
         int position = sns.indexOf(sn);
         if (position >= 0) {
             getSpinner(R.id.cage_sn).setSelection(position);
+            getSpinner(R.id.cage_sn).setEnabled(false);
         }
     }
 

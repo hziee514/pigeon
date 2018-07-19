@@ -62,7 +62,7 @@ public class CageInfoActivity extends BaseActivity<CageInfoDelegate> {
                 .subscribe(list -> {
                     this.groups.clear();
                     this.data.clear();
-                    groups.add(getString(R.string.feed_history));
+                    groups.add(getString(R.string.feed_history) + "[" + list.size() + "]");
                     data.add(new ArrayList<>(list));
                     getViewDelegate().updateList(true);
                 });

@@ -23,6 +23,7 @@ import cn.wrh.smart.dove.domain.event.BatchCageAdded;
 import cn.wrh.smart.dove.domain.event.CageStatusChanged;
 import cn.wrh.smart.dove.domain.event.RestoreCompleted;
 import cn.wrh.smart.dove.domain.model.CageModel;
+import cn.wrh.smart.dove.util.GroupUtils;
 import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.CageListDelegate;
 import io.reactivex.Flowable;
@@ -159,7 +160,7 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
         this.data.clear();
 
         grouped.forEach((key, value) -> {
-            this.groups.add(key);
+            this.groups.add(GroupUtils.getGroupText(key, value.size()));
             this.data.add(new ArrayList<>(value));
         });
 

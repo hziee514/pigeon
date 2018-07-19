@@ -20,6 +20,7 @@ import cn.wrh.smart.dove.domain.event.RestoreCompleted;
 import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.EggModel;
 import cn.wrh.smart.dove.domain.vo.EggVO;
+import cn.wrh.smart.dove.util.GroupUtils;
 import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.EggListDelegate;
 import io.reactivex.Flowable;
@@ -142,7 +143,7 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
         this.data.clear();
 
         grouped.forEach((key, value) -> {
-            this.groups.add(key);
+            this.groups.add(GroupUtils.getGroupText(key, value.size()));
             this.data.add(new ArrayList<>(value));
         });
 
