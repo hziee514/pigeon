@@ -1,6 +1,7 @@
 package cn.wrh.smart.dove.dal.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -19,7 +20,9 @@ public class DateConverter {
     @TypeConverter
     public static Date toDate(String timestamp) {
         try {
-            return timestamp == null ? null : new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).parse(timestamp);
+            return TextUtils.isEmpty(timestamp)
+                    ? null
+                    : new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).parse(timestamp);
         } catch (ParseException e) {
             Log.e("DateConverter", timestamp, e);
             return null;
