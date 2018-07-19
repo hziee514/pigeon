@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Random;
 
 import cn.wrh.smart.dove.util.DateUtils;
 
@@ -33,6 +34,26 @@ public class ExampleUnitTest {
         System.out.println(DateUtils.now());
         //System.out.println(DateTime.now(DateTimeZone.UTC).toDate());
         System.out.println(new Date());
+    }
+
+    @Test
+    public void alipayCode() {
+        System.out.println(randomAlipayCode());
+    }
+
+    private String randomAlipayCode() {
+        return "287" + randomNumber(15);
+    }
+
+    private String randomNumber(int len) {
+        final String NUMBER = "01234567890123456789";
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < len; i++) {
+            int index = random.nextInt(NUMBER.length());
+            sb.append(NUMBER.charAt(index));
+        }
+        return sb.toString();
     }
 
 }

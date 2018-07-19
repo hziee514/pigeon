@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import cn.wrh.smart.dove.R;
 import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.domain.bo.EggBO;
+import cn.wrh.smart.dove.domain.event.RestoreCompleted;
 import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.EggModel;
 import cn.wrh.smart.dove.domain.vo.EggVO;
@@ -98,6 +99,12 @@ public class EggListFragment extends BaseFragment<EggListDelegate> {
     @SuppressWarnings("unused")
     @Subscribe
     public void onSingleEggEdited(SingleEggEdited e) {
+        reload();
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onRestoreCompleted(RestoreCompleted e) {
         reload();
     }
 

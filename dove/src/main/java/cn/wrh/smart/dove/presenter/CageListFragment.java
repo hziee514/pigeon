@@ -21,6 +21,7 @@ import cn.wrh.smart.dove.Router;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.domain.event.BatchCageAdded;
 import cn.wrh.smart.dove.domain.event.CageStatusChanged;
+import cn.wrh.smart.dove.domain.event.RestoreCompleted;
 import cn.wrh.smart.dove.domain.model.CageModel;
 import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.view.CageListDelegate;
@@ -119,6 +120,12 @@ public class CageListFragment extends BaseFragment<CageListDelegate> {
     @SuppressWarnings("unused")
     @Subscribe
     public void onCageStatusChanged(CageStatusChanged e) {
+        reload();
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onRestoreCompleted(RestoreCompleted e) {
         reload();
     }
 

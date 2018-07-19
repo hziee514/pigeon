@@ -28,7 +28,7 @@
     </style>
     <style name="AppWidget.TextView" parent="AppWidget.Row">
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
     <style name="AppWidget.Spinner" parent="AppWidget.Row">
         <item name="android:gravity">center_vertical|end</item>
@@ -36,10 +36,10 @@
     <style name="AppWidget.EditText">
         <item name="android:paddingRight">48dp</item>
         <item name="android:gravity">center_vertical|end</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
     <style name="AppWidget.Button" parent="AppWidget.Row">
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>

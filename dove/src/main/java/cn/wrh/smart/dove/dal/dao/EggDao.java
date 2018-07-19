@@ -29,6 +29,9 @@ public interface EggDao {
     @Delete
     void delete(EggEntity...entities);
 
+    @Query("DELETE FROM T_EGG")
+    void clear();
+
     @Query("DELETE FROM T_EGG WHERE ID = :id")
     void delete(int id);
 

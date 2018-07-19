@@ -89,6 +89,10 @@ public abstract class AbstractViewDelegate implements ViewDelegate {
         return getResources().getString(resId);
     }
 
+    public String getString(@StringRes int id, Object... formatArgs) {
+        return getResources().getString(id, formatArgs);
+    }
+
     public void setOnClickListener(View.OnClickListener listener, @IdRes int...ids) {
         if (ids == null) {
             return;

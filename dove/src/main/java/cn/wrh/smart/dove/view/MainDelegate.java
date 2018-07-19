@@ -1,6 +1,7 @@
 package cn.wrh.smart.dove.view;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
@@ -55,6 +57,26 @@ public class MainDelegate extends AbstractViewDelegate
         toggle.syncState();
 
         initPager(((MainActivity)getActivity()).getSupportFragmentManager());
+    }
+
+    public void showWarnDialog(Runnable consumer, @StringRes int resId, Object...args) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(getString(resId, args))
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    dialog.dismiss();
+                    consumer.run();
+                })
+                .show();
+    }
+
+    public void showResultDialog(@StringRes int resId, Object...args) {
+        getActivity().runOnUiThread(() ->
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(getString(resId, args))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                        .show()
+        );
     }
 
     public void setNavigationItemSelectedListener(NavigationView.OnNavigationItemSelectedListener listener) {

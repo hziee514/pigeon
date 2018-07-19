@@ -80,7 +80,6 @@
         android:text="@string/save"
         android:minHeight="@dimen/row_min_height"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        style="@style/AppWidget.Button" />
 
 </LinearLayout>

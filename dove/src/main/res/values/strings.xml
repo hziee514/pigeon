@@ -3,8 +3,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="settings">设置</string>
@@ -34,4 +32,10 @@
     <string name="first_cant_gt_last">起始序号不能大于结束序号</string>
     <string name="reset_confirm">是否放弃今日工作进度并重新计算今日工作内容？</string>
     <string name="del_egg_confirm">确定要删除这条养殖记录？</string>
+    <string name="restore_warn_message">清除所有数据后从选定文件恢复\n操作前请再次确认\n选定文件: %1$s</string>
+    <string name="restore_complete_message">恢复成功: 笼位=%1$d,鸽蛋=%2$d</string>
+    <string name="restore_error_message">恢复失败: %1$s</string>
+    <string name="backup_warn_message">是否备份当前数据到文件\n路径: %1$s</string>
+    <string name="backup_complete_message">备份成功: 笼位=%1$d,鸽蛋=%2$d</string>
+    <string name="backup_error_message">备份失败: %1$s</string>
 </resources>

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import cn.wrh.smart.dove.dal.dao.TaskDao;
 import cn.wrh.smart.dove.dal.entity.EggEntity;
 import cn.wrh.smart.dove.dal.entity.TaskEntity;
 import cn.wrh.smart.dove.domain.bo.TaskBO;
+import cn.wrh.smart.dove.domain.event.RestoreCompleted;
 import cn.wrh.smart.dove.domain.event.SingleEggEdited;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.util.DateUtils;
@@ -125,6 +127,19 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
         }
 
+        reload();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onUnload() {
+        EventBus.getDefault().unregister(this);
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onRestoreCompleted(RestoreCompleted e) {
         reload();
     }
 

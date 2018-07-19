@@ -80,6 +80,10 @@ public abstract class BaseActivity<T extends ViewDelegate> extends CompatActivit
         Snackbar.make(getViewDelegate().getRootView(), resId, Snackbar.LENGTH_SHORT).show();
     }
 
+    protected void toast(String message) {
+        Snackbar.make(getViewDelegate().getRootView(), message, Snackbar.LENGTH_SHORT).show();
+    }
+
     protected AppDatabase getDatabase() {
         return AppDatabase.getInstance(getApplicationContext());
     }

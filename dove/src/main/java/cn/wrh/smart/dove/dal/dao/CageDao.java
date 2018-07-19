@@ -28,11 +28,17 @@ public interface CageDao {
     @Delete
     void delete(CageEntity...entities);
 
+    @Query("DELETE FROM T_CAGE")
+    void clear();
+
     @Query("SELECT * FROM T_CAGE WHERE ID = :id")
     CageEntity fetch(int id);
 
     @Query("SELECT * FROM T_CAGE ORDER BY SERIAL_NUMBER")
     List<CageEntity> query();
+
+    @Query("SELECT * FROM T_CAGE")
+    List<CageEntity> queryAll();
 
     @Query("SELECT * FROM T_CAGE WHERE STATUS = :status ORDER BY SERIAL_NUMBER")
     List<CageEntity> query(CageModel.Status status);
