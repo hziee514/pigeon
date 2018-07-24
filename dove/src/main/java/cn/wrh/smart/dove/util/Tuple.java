@@ -22,4 +22,12 @@ public class Tuple<A, B> {
     public B getSecond() {
         return second;
     }
+
+    @Override
+    public String toString() {
+        return "Tuple{" +
+                "first=" + first +
+                ", second=" + second +
+                '}';
+    }
 }

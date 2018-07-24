@@ -34,7 +34,6 @@ public class MainDelegate extends AbstractViewDelegate
     private DrawerLayout drawer;
     private ViewPager pager;
     private BottomNavigationView navigationView;
-    private ProgressDialog progressDialog;
 
     @Override
     public int getRootLayoutId() {
@@ -59,20 +58,6 @@ public class MainDelegate extends AbstractViewDelegate
         toggle.syncState();
 
         initPager(((MainActivity)getActivity()).getSupportFragmentManager());
-    }
-
-    private void showWaiting() {
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage(getString(R.string.waiting_message));
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-    }
-
-    private void hideWaiting() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
     }
 
     public void showWarnDialog(Runnable consumer, @StringRes int resId, Object...args) {

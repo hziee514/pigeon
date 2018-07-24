@@ -1,6 +1,7 @@
 package cn.wrh.smart.dove.mvp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import cn.wrh.smart.dove.R;
+
 import static android.view.View.NO_ID;
 
 /**
@@ -22,6 +25,7 @@ import static android.view.View.NO_ID;
 public abstract class AbstractViewDelegate implements ViewDelegate {
 
     private View rootView;
+    private ProgressDialog progressDialog;
 
     public abstract @LayoutRes int getRootLayoutId();
 
@@ -99,6 +103,20 @@ public abstract class AbstractViewDelegate implements ViewDelegate {
         }
         for (int id : ids) {
             findViewById(id).setOnClickListener(listener);
+        }
+    }
+
+    public void showWaiting() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage(getString(R.string.waiting_message));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    public void hideWaiting() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
         }
     }
 

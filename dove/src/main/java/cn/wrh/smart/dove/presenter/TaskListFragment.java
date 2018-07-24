@@ -41,8 +41,7 @@ import static cn.wrh.smart.dove.Router.EXTRA_EGG_ID;
  * @author bruce.wu
  * @date 2018/7/14
  */
-public class TaskListFragment extends BaseFragment<TaskListDelegate>
-        implements TaskListDelegate.ActionListener {
+public class TaskListFragment extends BaseFragment<TaskListDelegate> {
 
     public static TaskListFragment newInstance() {
         return new TaskListFragment();
@@ -90,7 +89,7 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     private void doReset() {
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
-                .subscribe(i -> {
+                .map(i -> {
                     final TaskBuilder builder = new TaskBuilder(getDatabase());
 
                     builder.clear();
@@ -103,7 +102,14 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
                     builder.buildSell();
 
                     reload();
-                });
+
+                    return i;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(subscription -> getViewDelegate().showWaiting())
+                .doOnComplete(getViewDelegate()::hideWaiting)
+                .doOnError(tr -> getViewDelegate().hideWaiting())
+                .subscribe();
     }
 
     private void onFilter() {
@@ -121,8 +127,10 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
     @Override
     protected void onLoaded(@Nullable Bundle state) {
         getViewDelegate().setupList(groups, data);
-        getViewDelegate().setActionListener(this);
-        getViewDelegate().setOnItemClick(this::onItemClicked);
+        //getViewDelegate().setActionListener(this);
+        getViewDelegate().setOnItemClick(this::onItemClicked)
+                .setOnTaskConfirm(this::onTaskConfirmed)
+                .setOnTaskFinish(this::onTaskFinished);
 
         if (state != null) {
             currentFilter = state.getInt(STATE_FILTER, FILTER_ALL);
@@ -180,47 +188,6 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
         getViewDelegate().updateList();
     }
 
-    @Override
-    public void onConfirm(int groupPosition, int childPosition) {
-        TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
-        EggLifecycle lifecycle = EggLifecycle.create(getDatabase());
-        EggEntity entity = null;
-        switch (bo.getType()) {
-            case Lay1:
-                entity = lifecycle.toLaid1(bo);
-                break;
-            case Lay2:
-                entity = lifecycle.toLaid2(bo);
-                break;
-            case Review:
-                entity = lifecycle.toReviewed(bo);
-                break;
-            case Hatch:
-                entity = lifecycle.toHatched(bo);
-                break;
-            case Sell:
-                entity = lifecycle.toSold(bo);
-                break;
-        }
-        EventBus.getDefault().post(new SingleEggEdited(entity));
-        onFinish(groupPosition, childPosition);
-    }
-
-    @Override
-    public void onFinish(int groupPosition, int childPosition) {
-        Date now = DateUtils.now();
-
-        TaskBO bo = (TaskBO)data.get(groupPosition).get(childPosition);
-        bo.setFinishedAt(now);
-        bo.setStatus(TaskModel.Status.Finished);
-
-        TaskDao dao = getDatabase().taskDao();
-        TaskEntity entity = dao.fetch(bo.getId());
-        entity.setFinishedAt(now);
-        entity.setStatus(TaskModel.Status.Finished);
-        dao.update(entity);
-    }
-
     public void onItemClicked(Tuple<Integer, Integer> args) {
         TaskBO bo = (TaskBO)data.get(args.getFirst()).get(args.getSecond());
         if (bo.getEggId() > 0) {
@@ -228,6 +195,32 @@ public class TaskListFragment extends BaseFragment<TaskListDelegate>
             bundle.putInt(EXTRA_EGG_ID, bo.getEggId());
             Router.route(getActivity(), AddEggActivity.class, bundle);
         }
+    }
+
+    public void onTaskConfirmed(Tuple<Integer, Integer> args) {
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .subscribe(i -> {
+                    final TaskBO bo = (TaskBO)data.get(args.getFirst()).get(args.getSecond());
+                    EggEntity entity = EggLifecycle.create(getDatabase()).forward(bo);
+                    EventBus.getDefault().post(new SingleEggEdited(entity));
+                    onTaskFinished(args);
+                });
+    }
+
+    public void onTaskFinished(Tuple<Integer, Integer> args) {
+        Flowable.just(1)
+                .subscribeOn(Schedulers.io())
+                .subscribe(i -> {
+                    TaskBO bo = (TaskBO)data.get(args.getFirst()).get(args.getSecond());
+                    Date now = DateUtils.now();
+                    TaskDao dao = getDatabase().taskDao();
+                    TaskEntity entity = dao.fetch(bo.getId());
+                    entity.setFinishedAt(now);
+                    entity.setStatus(TaskModel.Status.Finished);
+                    dao.update(entity);
+                    reload();
+                });
     }
 
 }

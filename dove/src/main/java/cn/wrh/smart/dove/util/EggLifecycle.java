@@ -69,4 +69,26 @@ public class EggLifecycle {
         return entity;
     }
 
+    public EggEntity forward(TaskBO bo) {
+        EggEntity entity = null;
+        switch (bo.getType()) {
+            case Lay1:
+                entity = toLaid1(bo);
+                break;
+            case Lay2:
+                entity = toLaid2(bo);
+                break;
+            case Review:
+                entity = toReviewed(bo);
+                break;
+            case Hatch:
+                entity = toHatched(bo);
+                break;
+            case Sell:
+                entity = toSold(bo);
+                break;
+        }
+        return entity;
+    }
+
 }

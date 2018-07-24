@@ -28,8 +28,14 @@ import io.reactivex.FlowableEmitter;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * A:SN|STATUS|CREATED_AT
- * B:CAGE_SN|COUNT|LAYING_AT|REVIEW_AT|HATCH_AT|SOLD_AT
+ * Backup file format
+ *  First line:
+ *   flag, timestamp, versionName
+ *   DOVE:yyyy-MM-dd HH:mm:ss|2.0.3
+ *  Cage line:
+ *   A:SN|STATUS|CREATED_AT
+ *  Egg line:
+ *   B:CAGE_SN|COUNT|LAYING_AT|REVIEW_AT|HATCH_AT|SOLD_AT
  *
  * @author bruce.wu
  * @date 2018/7/19
@@ -103,7 +109,7 @@ public class BackupManager {
         final Counter counter = new Counter();
         final File file0 = getFile(0);
         if (!file0.exists()) {
-            error.accept(new FileNotFoundException());
+            error.accept(new FileNotFoundException("File " + file0.getName() + " not exist"));
             return;
         }
         Flowable.just(1)

@@ -14,9 +14,6 @@ import cn.wrh.smart.dove.domain.bo.TaskBO;
 import cn.wrh.smart.dove.domain.model.TaskModel;
 import cn.wrh.smart.dove.util.Tuple;
 import cn.wrh.smart.dove.widget.MyExpandableListAdapter;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author bruce.wu
@@ -24,21 +21,28 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class TaskListDelegate extends AbstractListDelegate {
 
-    private ActionListener actionListener;
-
     private Consumer<Tuple<Integer, Integer>> onItemClick;
+    private Consumer<Tuple<Integer, Integer>> onTaskConfirm;
+    private Consumer<Tuple<Integer, Integer>> onTaskFinish;
 
     @Override
     public int getOptionsMenuId() {
         return R.menu.main_tab_task;
     }
 
-    public void setActionListener(ActionListener listener) {
-        this.actionListener = listener;
+    public TaskListDelegate setOnItemClick(Consumer<Tuple<Integer, Integer>> listener) {
+        this.onItemClick = listener;
+        return this;
     }
 
-    public void setOnItemClick(Consumer<Tuple<Integer, Integer>> listener) {
-        this.onItemClick = listener;
+    public TaskListDelegate setOnTaskConfirm(Consumer<Tuple<Integer, Integer>> listener) {
+        this.onTaskConfirm = listener;
+        return this;
+    }
+
+    public TaskListDelegate setOnTaskFinish(Consumer<Tuple<Integer, Integer>> listener) {
+        this.onTaskFinish = listener;
+        return this;
     }
 
     @Override
@@ -64,14 +68,6 @@ public class TaskListDelegate extends AbstractListDelegate {
                     consumer.accept(which);
                 })
                 .show();
-    }
-
-    public interface ActionListener {
-
-        void onConfirm(int groupPosition, int childPosition);
-
-        void onFinish(int groupPosition, int childPosition);
-
     }
 
     class TaskExpandableListAdapter extends MyExpandableListAdapter {
@@ -101,15 +97,12 @@ public class TaskListDelegate extends AbstractListDelegate {
             new AlertDialog.Builder(getActivity())
                     .setItems(R.array.task_actions, (dialog, which) -> {
                         dialog.dismiss();
-                        if (actionListener == null) {
-                            return;
-                        }
                         switch (which) {
                             case 0: //已经确认
-                                doConfirm(view, groupPosition, childPosition);
+                                doConfirm(groupPosition, childPosition);
                                 break;
                             case 1: //明天在看
-                                doFinish(view, groupPosition, childPosition);
+                                doFinish(groupPosition, childPosition);
                                 break;
                         }
                     })
@@ -117,26 +110,16 @@ public class TaskListDelegate extends AbstractListDelegate {
             return true;
         }
 
-        private void doConfirm(View view, int groupPosition, int childPosition) {
-            Flowable.just(1)
-                    .subscribeOn(Schedulers.io())
-                    .map(i -> {
-                        actionListener.onConfirm(groupPosition, childPosition);
-                        return i;
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(i -> bindChild(view, groupPosition, childPosition));
+        private void doConfirm(int groupPosition, int childPosition) {
+            if (onTaskConfirm != null) {
+                onTaskConfirm.accept(new Tuple<>(groupPosition, childPosition));
+            }
         }
 
-        private void doFinish(View view, int groupPosition, int childPosition) {
-            Flowable.just(1)
-                    .subscribeOn(Schedulers.io())
-                    .map(i -> {
-                        actionListener.onFinish(groupPosition, childPosition);
-                        return i;
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(i -> bindChild(view, groupPosition, childPosition));
+        private void doFinish(int groupPosition, int childPosition) {
+            if (onTaskFinish != null) {
+                onTaskFinish.accept(new Tuple<>(groupPosition, childPosition));
+            }
         }
 
         private void setName(View view, String name) {

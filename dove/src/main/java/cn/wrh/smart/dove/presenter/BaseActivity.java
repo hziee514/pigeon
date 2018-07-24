@@ -1,6 +1,7 @@
 package cn.wrh.smart.dove.presenter;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,7 +32,14 @@ public abstract class BaseActivity<T extends ViewDelegate> extends CompatActivit
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        onIntentReceived(getIntent());
         new Handler().postDelayed(this::checkSelfPermissions, 100);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        onIntentReceived(intent);
     }
 
     @Override
@@ -52,6 +60,10 @@ public abstract class BaseActivity<T extends ViewDelegate> extends CompatActivit
         }
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    protected void onIntentReceived(Intent intent) {
+
     }
 
     protected void onPermissionsGranted() {
