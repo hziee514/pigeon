@@ -1,5 +1,6 @@
 package cn.wrh.smart.dove.presenter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,6 +48,17 @@ public class MainActivity extends BaseActivity<MainDelegate>
         }
         getViewDelegate().closeDrawer();
         return true;
+    }
+
+    @Override
+    protected void onIntentReceived(Intent intent) {
+        if (!Intent.ACTION_VIEW.equals(intent.getAction())) {
+            return;
+        }
+        if (intent.getData() == null) {
+            return;
+        }
+        Log.i(TAG, intent.getData().getLastPathSegment());
     }
 
     private void onBackup() {

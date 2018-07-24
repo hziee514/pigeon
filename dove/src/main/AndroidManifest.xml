@@ -23,7 +23,19 @@
         <activity
             android:name=".presenter.MainActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="content"
+                    android:host="com.android.externalstorage.documents"
+                    android:pathPrefix="/document/"
+                    android:mimeType="application/octet-stream" />
+            </intent-filter>
+        </activity>
         <activity android:name=".presenter.AddCageActivity" />
         <activity android:name=".presenter.AddEggActivity" />
         <activity android:name=".presenter.CageInfoActivity" />
