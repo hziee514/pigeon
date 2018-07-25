@@ -19,6 +19,10 @@ class Converter {
     private static final String PREFIX_EGG = "B:";
     private static final String FIELD_SPLITTER = "|";
 
+    static String parseHeader(BackupFile.Meta meta) {
+        return TYPE_FLAG + meta.getTimestamp() + FIELD_SPLITTER + meta.getVersion();
+    }
+
     static BackupFile.Meta parseHeader(String text) throws FileFormatException {
         if (text == null) {
             throw new FileFormatException("Empty header text");

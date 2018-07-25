@@ -2,6 +2,7 @@ package cn.wrh.smart.dove.storage;
 
 import android.content.ContentResolver;
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -11,8 +12,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.stream.Stream;
 
+import cn.wrh.smart.dove.BuildConfig;
+import cn.wrh.smart.dove.dal.converter.DateConverter;
 import cn.wrh.smart.dove.dal.entity.CageEntity;
 import cn.wrh.smart.dove.dal.entity.EggEntity;
 import io.reactivex.BackpressureStrategy;
@@ -33,6 +37,8 @@ import io.reactivex.FlowableEmitter;
  * @date 2018/7/20
  */
 public class BackupFile {
+
+    private static final String TAG = "BackupFile";
 
     public static Reader read(ContentResolver resolver, Uri uri) throws Exception {
         return new Reader(resolver, uri);
@@ -93,10 +99,18 @@ public class BackupFile {
                 throw new FileFormatException("Can not open file to write");
             }
             this.out = new PrintWriter(new OutputStreamWriter(os));
+            writeMeta();
         }
 
-        public void write(Meta meta) {
+        private void write(String line) {
+            Log.v(TAG, "write: " + line);
+            out.println(line);
+        }
 
+        private void writeMeta() {
+            String timestamp = DateConverter.toTimestamp(new Date());
+            String header = Converter.parseHeader(new Meta(timestamp, BuildConfig.VERSION_NAME));
+            write(header);
         }
 
         public void write(CageEntity entity) {
