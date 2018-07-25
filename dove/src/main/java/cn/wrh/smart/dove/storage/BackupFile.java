@@ -8,8 +8,16 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.stream.Stream;
+
+import cn.wrh.smart.dove.dal.entity.CageEntity;
+import cn.wrh.smart.dove.dal.entity.EggEntity;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
 
 /**
  *  Backup file format
@@ -28,6 +36,24 @@ public class BackupFile {
 
     public static Reader read(ContentResolver resolver, Uri uri) throws Exception {
         return new Reader(resolver, uri);
+    }
+
+    public static Writer write(ContentResolver resolver, Uri uri) throws Exception {
+        return new Writer(resolver, uri);
+    }
+
+    public static Flowable<Object> flowable(ContentResolver resolver, Uri uri) {
+        return Flowable.create((FlowableEmitter<Object> emitter) -> {
+            try (Reader reader = read(resolver, uri)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    emitter.onNext(Converter.parseLine(line));
+                }
+                emitter.onComplete();
+            } catch (Exception e) {
+                emitter.onError(e);
+            }
+        }, BackpressureStrategy.BUFFER);
     }
 
     public static class Meta {
@@ -62,6 +88,22 @@ public class BackupFile {
         private PrintWriter out;
 
         Writer(ContentResolver resolver, Uri uri) throws Exception {
+            OutputStream os = resolver.openOutputStream(uri);
+            if (os == null) {
+                throw new FileFormatException("Can not open file to write");
+            }
+            this.out = new PrintWriter(new OutputStreamWriter(os));
+        }
+
+        public void write(Meta meta) {
+
+        }
+
+        public void write(CageEntity entity) {
+
+        }
+
+        public void write(String cageSn, EggEntity entity) {
 
         }
 
@@ -82,7 +124,7 @@ public class BackupFile {
         Reader(ContentResolver resolver, Uri uri) throws Exception {
             InputStream is = resolver.openInputStream(uri);
             if (is == null) {
-                throw new FileFormatException("Can not open file");
+                throw new FileFormatException("Can not open file to read");
             }
             in = new BufferedReader(new InputStreamReader(is));
             this.meta = Converter.parseHeader(in.readLine());
@@ -90,6 +132,14 @@ public class BackupFile {
 
         public Stream<String> lines() {
             return in.lines();
+        }
+
+        public String readLine() throws IOException {
+            return in.readLine();
+        }
+
+        public Meta getMeta() {
+            return meta;
         }
 
         @Override
