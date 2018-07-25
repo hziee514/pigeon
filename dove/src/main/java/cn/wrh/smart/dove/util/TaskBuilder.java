@@ -4,6 +4,8 @@ import cn.wrh.smart.dove.dal.AppDatabase;
 import cn.wrh.smart.dove.domain.model.EggModel;
 
 import static cn.wrh.smart.dove.domain.model.CageModel.Status.Idle;
+import static cn.wrh.smart.dove.domain.model.EggModel.Stage.Hatched;
+import static cn.wrh.smart.dove.domain.model.EggModel.Stage.Laid1;
 import static cn.wrh.smart.dove.domain.model.EggModel.Stage.Laid2;
 import static cn.wrh.smart.dove.domain.model.EggModel.Stage.Reviewed;
 import static cn.wrh.smart.dove.domain.model.TaskModel.Status.Waiting;
@@ -42,15 +44,22 @@ public class TaskBuilder {
     }
 
     /**
-     * 孵化后第14天后要检查下蛋
+     * 孵化后过12天后要检查下蛋
+     * 忽略已有 Laid1, Laid2, Reviewed 以及 Hatched 但在12天以内
      */
     public void buildFirst2() {
         String sql = "INSERT INTO T_TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
                 "SELECT DISTINCT a.ID AS CAGE_ID, 0 AS EGG_ID, ? AS TYPE, datetime('now','localtime') AS CREATED_AT, ? AS STATUS " +
                 "FROM T_CAGE a, T_EGG b " +
                 "WHERE a.STATUS != ? AND a.id = b.CAGE_ID " +
-                "AND b.STAGE = ? AND date(b.HATCH_AT,'14 day') < date('now','localtime')";
-        database.exec(sql, Lay1, Waiting, Idle, EggModel.Stage.Hatched);
+                "AND b.STAGE = ? AND date(b.HATCH_AT,'12 day') < date('now','localtime') " +
+                "AND a.ID NOT IN( " +
+                " SELECT DISTINCT CAGE_ID FROM T_EGG " +
+                " WHERE STAGE IN (?, ?, ?) " +
+                " OR (STAGE = ? AND date(b.HATCH_AT,'12 day') >= date('now','localtime')) " +
+                ") ";
+        database.exec(sql, Lay1, Waiting, Idle, Hatched,
+                Laid1, Laid2, Reviewed, Hatched);
     }
 
     /**
@@ -69,7 +78,7 @@ public class TaskBuilder {
     }
 
     /**
-     * 下第二个蛋后第4天检查蛋的好坏
+     * 下第二个蛋后第4天到17天之间要检查蛋的好坏
      */
     public void buildReview() {
         String sql = "INSERT INTO T_TASK(CAGE_ID, EGG_ID, TYPE, CREATED_AT, STATUS) " +
