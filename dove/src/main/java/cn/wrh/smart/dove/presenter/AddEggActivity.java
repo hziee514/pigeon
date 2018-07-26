@@ -8,9 +8,9 @@ import android.widget.EditText;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 import cn.wrh.smart.dove.R;
-import cn.wrh.smart.dove.dal.AppDatabase;
 import cn.wrh.smart.dove.dal.entity.EggEntity;
 import cn.wrh.smart.dove.domain.bo.EggBO;
 import cn.wrh.smart.dove.domain.event.SingleEggEdited;
@@ -47,9 +47,8 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(i -> {
-                    final AppDatabase database = getDatabase();
-                    return new Tuple<>(database.eggDao().findById(id),
-                            database.cageDao().querySnsInUsing());
+                    final EggBO egg = getDatabase().eggDao().findById(id);
+                    return new Tuple<>(egg, Collections.singletonList(egg.getCageSn()));
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tuple -> {
