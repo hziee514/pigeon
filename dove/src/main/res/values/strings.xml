@@ -25,6 +25,7 @@
     <string name="lbl_count">数量*</string>
     <string name="lbl_review">检查</string>
     <string name="lbl_hatch">孵化</string>
+    <string name="lbl_sale">出栏</string>
     <string name="save">保存</string>
     <string name="delete">删除</string>
     <string name="feed_history">养殖记录</string>
