@@ -69,6 +69,10 @@ public class AddEggDelegate extends AbstractViewDelegate {
         getTextView(R.id.hatch).setText(dt);
     }
 
+    public void setSaleDt(String dt) {
+        getTextView(R.id.sale).setText(dt);
+    }
+
     public String getSn() {
         return (String)getSpinner(R.id.cage_sn).getSelectedItem();
     }
@@ -89,6 +93,11 @@ public class AddEggDelegate extends AbstractViewDelegate {
 
     public Date getHatchDt() {
         String dt = getTextView(R.id.hatch).getText().toString();
+        return DateUtils.getDateForEntity(dt);
+    }
+
+    public Date getSaleDt() {
+        String dt = getTextView(R.id.sale).getText().toString();
         return DateUtils.getDateForEntity(dt);
     }
 

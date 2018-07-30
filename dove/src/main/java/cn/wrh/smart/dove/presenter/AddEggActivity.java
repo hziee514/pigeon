@@ -34,7 +34,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
         } else {
             doInit();
         }
-        getViewDelegate().setOnClickListener(this::onClickDateEditor, R.id.laying, R.id.review, R.id.hatch);
+        getViewDelegate().setOnClickListener(this::onClickDateEditor, R.id.laying, R.id.review, R.id.hatch, R.id.sale);
         getViewDelegate().setOnClickListener(this::onClickSave, R.id.btn_save);
         getViewDelegate().setOnClickListener(this::onClickDelete, R.id.btn_del);
     }
@@ -59,6 +59,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
                     delegate.setLayingDt(DateUtils.getDateForEditor(bo.getLayingAt()));
                     delegate.setReviewDt(DateUtils.getDateForEditor(bo.getReviewAt()));
                     delegate.setHatchDt(DateUtils.getDateForEditor(bo.getHatchAt()));
+                    delegate.setSaleDt(DateUtils.getDateForEditor(bo.getSoldAt()));
                 });
     }
 
@@ -96,6 +97,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
                     entity.setCount(delegate.getCount());
                     entity.setReviewAt(delegate.getReviewDt());
                     entity.setHatchAt(delegate.getHatchDt());
+                    entity.setSoldAt(delegate.getSaleDt());
                     entity.determineStage();
                     if (eggId > 0) {
                         getDatabase().eggDao().update(entity);

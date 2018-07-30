@@ -8,8 +8,8 @@ android {
         applicationId "cn.wrh.smart.dove"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 5
-        versionName "2.0.4"
+        versionCode 6
+        versionName "2.0.5"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
