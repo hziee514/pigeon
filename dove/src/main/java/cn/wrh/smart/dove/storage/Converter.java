@@ -38,6 +38,20 @@ class Converter {
         return new BackupFile.Meta(fields[0], fields[1]);
     }
 
+    static String fromCage(CageEntity entity) {
+        return PREFIX_CAGE + entity.getSerialNumber()
+                + FIELD_SPLITTER + CageStatusConverter.fromStatus(entity.getStatus())
+                + FIELD_SPLITTER + toTimestamp(entity.getCreatedAt());
+    }
+
+    static String fromEgg(String sn, EggEntity entity) {
+        return PREFIX_EGG + sn + FIELD_SPLITTER + entity.getCount()
+                + FIELD_SPLITTER + toTimestamp(entity.getLayingAt())
+                + FIELD_SPLITTER + toTimestamp(entity.getReviewAt())
+                + FIELD_SPLITTER + toTimestamp(entity.getHatchAt())
+                + FIELD_SPLITTER + toTimestamp(entity.getSoldAt());
+    }
+
     public static Object parseLine(String text) throws FileFormatException {
         if (isCage(text)) {
             return toCage(text);
@@ -93,11 +107,11 @@ class Converter {
     }
 
     private static boolean isCage(String text) {
-        return PREFIX_CAGE.indexOf(text) == 0;
+        return text != null && text.startsWith(PREFIX_CAGE);
     }
 
     private static boolean isEgg(String text) {
-        return text.startsWith(PREFIX_EGG);
+        return text != null && text.startsWith(PREFIX_EGG);
     }
 
     private static String fieldSplitPattern() {

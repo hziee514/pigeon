@@ -48,6 +48,7 @@ public class BackupFile {
         return new Writer(resolver, uri);
     }
 
+    @Deprecated
     public static Flowable<Object> flowable(ContentResolver resolver, Uri uri) {
         return Flowable.create((FlowableEmitter<Object> emitter) -> {
             try (Reader reader = read(resolver, uri)) {
@@ -93,6 +94,8 @@ public class BackupFile {
 
         private PrintWriter out;
 
+        private final Counter counter = new Counter();
+
         Writer(ContentResolver resolver, Uri uri) throws Exception {
             OutputStream os = resolver.openOutputStream(uri);
             if (os == null) {
@@ -100,6 +103,10 @@ public class BackupFile {
             }
             this.out = new PrintWriter(new OutputStreamWriter(os));
             writeMeta();
+        }
+
+        public Counter getCounter() {
+            return counter;
         }
 
         private void write(String line) {
@@ -114,15 +121,17 @@ public class BackupFile {
         }
 
         public void write(CageEntity entity) {
-
+            counter.incCage();
+            write(Converter.fromCage(entity));
         }
 
         public void write(String cageSn, EggEntity entity) {
-
+            counter.incEgg();
+            write(Converter.fromEgg(cageSn, entity));
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (out != null) {
                 out.close();
             }
@@ -141,7 +150,7 @@ public class BackupFile {
                 throw new FileFormatException("Can not open file to read");
             }
             in = new BufferedReader(new InputStreamReader(is));
-            this.meta = Converter.parseHeader(in.readLine());
+            this.meta = Converter.parseHeader(readLine());
         }
 
         public Stream<String> lines() {
@@ -149,7 +158,9 @@ public class BackupFile {
         }
 
         public String readLine() throws IOException {
-            return in.readLine();
+            String line = in.readLine();
+            Log.v(TAG, "readLine: " + line);
+            return line;
         }
 
         public Meta getMeta() {
@@ -157,9 +168,13 @@ public class BackupFile {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (in != null) {
-                in.close();
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "reader.close", e);
+                }
             }
         }
     }
