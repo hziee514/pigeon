@@ -1,4 +1,4 @@
-package cn.wrh.smart.dove.dal.exception;
+package cn.wrh.smart.dove.storage;
 
 /**
  * @author bruce.wu
