@@ -8,8 +8,8 @@ android {
         applicationId "cn.wrh.smart.dove"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 6
-        versionName "2.0.5"
+        versionCode 7
+        versionName "2.1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -46,6 +46,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all {
+        variant -> variant.outputs.all {
+            output -> outputFileName = output.outputFile.name.replace(".apk", "-v" + defaultConfig.versionName + ".apk")
+        }
     }
 
     lintOptions {
