@@ -8,9 +8,9 @@ import android.widget.EditText;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 import cn.wrh.smart.dove.R;
-import cn.wrh.smart.dove.dal.AppDatabase;
 import cn.wrh.smart.dove.dal.entity.EggEntity;
 import cn.wrh.smart.dove.domain.bo.EggBO;
 import cn.wrh.smart.dove.domain.event.SingleEggEdited;
@@ -34,7 +34,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
         } else {
             doInit();
         }
-        getViewDelegate().setOnClickListener(this::onClickDateEditor, R.id.laying, R.id.review, R.id.hatch);
+        getViewDelegate().setOnClickListener(this::onClickDateEditor, R.id.laying, R.id.review, R.id.hatch, R.id.sale);
         getViewDelegate().setOnClickListener(this::onClickSave, R.id.btn_save);
         getViewDelegate().setOnClickListener(this::onClickDelete, R.id.btn_del);
     }
@@ -47,9 +47,8 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
         Flowable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(i -> {
-                    final AppDatabase database = getDatabase();
-                    return new Tuple<>(database.eggDao().findById(id),
-                            database.cageDao().querySnsInUsing());
+                    final EggBO egg = getDatabase().eggDao().findById(id);
+                    return new Tuple<>(egg, Collections.singletonList(egg.getCageSn()));
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tuple -> {
@@ -60,6 +59,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
                     delegate.setLayingDt(DateUtils.getDateForEditor(bo.getLayingAt()));
                     delegate.setReviewDt(DateUtils.getDateForEditor(bo.getReviewAt()));
                     delegate.setHatchDt(DateUtils.getDateForEditor(bo.getHatchAt()));
+                    delegate.setSaleDt(DateUtils.getDateForEditor(bo.getSoldAt()));
                 });
     }
 
@@ -97,6 +97,7 @@ public class AddEggActivity extends BaseActivity<AddEggDelegate> {
                     entity.setCount(delegate.getCount());
                     entity.setReviewAt(delegate.getReviewDt());
                     entity.setHatchAt(delegate.getHatchDt());
+                    entity.setSoldAt(delegate.getSaleDt());
                     entity.determineStage();
                     if (eggId > 0) {
                         getDatabase().eggDao().update(entity);

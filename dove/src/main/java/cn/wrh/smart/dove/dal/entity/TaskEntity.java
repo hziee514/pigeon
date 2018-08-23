@@ -118,4 +118,8 @@ public class TaskEntity implements TaskModel {
                 model.getType(), model.getCreatedAt(), model.getFinishedAt(), model.getStatus());
     }
 
+    public boolean isFinished() {
+        return this.status == Status.Finished;
+    }
+
 }

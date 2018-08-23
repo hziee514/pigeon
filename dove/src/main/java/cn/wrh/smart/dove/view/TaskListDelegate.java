@@ -94,6 +94,10 @@ public class TaskListDelegate extends AbstractListDelegate {
 
         @Override
         protected boolean onItemLongClick(View view, int groupPosition, int childPosition) {
+            TaskBO bo = (TaskBO)getChild(groupPosition, childPosition);
+            if (bo.isFinished()) {
+                return true;
+            }
             new AlertDialog.Builder(getActivity())
                     .setItems(R.array.task_actions, (dialog, which) -> {
                         dialog.dismiss();

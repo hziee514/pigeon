@@ -13,7 +13,7 @@
     tools:context=".presenter.AddEggActivity">
 
     <android.support.v7.widget.GridLayout
-        app:rowCount="5"
+        app:rowCount="6"
         app:columnCount="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -66,6 +66,18 @@
             style="@style/AppWidget.TextView" />
         <EditText
             android:id="@+id/hatch"
+            android:inputType="date"
+            android:hint="yyyy-MM-dd"
+            android:focusable="false"
+            app:layout_columnWeight="3"
+            style="@style/AppWidget.EditText"/>
+
+        <TextView
+            android:text="@string/lbl_sale"
+            app:layout_columnWeight="1"
+            style="@style/AppWidget.TextView" />
+        <EditText
+            android:id="@+id/sale"
             android:inputType="date"
             android:hint="yyyy-MM-dd"
             android:focusable="false"
